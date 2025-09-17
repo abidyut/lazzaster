@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster Admin Control Panel</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-shell">
+        <!-- Header -->
+        <div class="admin-header">
+            <div class="logo-section">
+                <div class="logo-badge">Z</div>
+                <div class="logo-text">Lazzaster Admin</div>
+            </div>
+            <div class="admin-actions">
+                <button class="logout-btn" onclick="adminManager.logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Login Form (initially visible) -->
+        <div id="loginSection" class="login-section">
+            <div class="login-container">
+                <h2>Administrator Login</h2>
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <label for="adminUsername">Admin Username:</label>
+                        <input type="text" id="adminUsername" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Admin Password:</label>
+                        <input type="password" id="adminPassword" name="password" required>
+                    </div>
+                    <button type="submit" class="login-btn">Login</button>
+                </form>
+                <div id="loginMessage" class="message"></div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard (initially hidden) -->
+        <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+            <!-- Navigation Tabs -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="adminManager.showTab('users')">Users</button>
+                <button class="tab-btn" onclick="adminManager.showTab('deposits')">Deposits</button>
+                <button class="tab-btn" onclick="adminManager.showTab('withdrawals')">Withdrawals</button>
+                <button class="tab-btn" onclick="adminManager.showTab('balances')">Balances</button>
+                <button class="tab-btn" onclick="adminManager.showTab('settings')">Settings</button>
+                <button class="tab-btn" onclick="adminManager.showTab('logs')">Logs</button>
+            </div>
+
+            <!-- Users Management Tab -->
+            <div id="usersTab" class="tab-content active">
+                <div class="section-header">
+                    <h3>User Management</h3>
+                    <button class="refresh-btn" onclick="adminManager.loadUsers()">Refresh</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="userSearch" placeholder="Search users by username or email..." onkeyup="adminManager.filterUsers()">
+                </div>
+                <div class="users-list" id="usersList">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Deposits Management Tab -->
+            <div id="depositsTab" class="tab-content">
+                <div class="section-header">
+                    <h3>Deposit Management</h3>
+                    <button class="refresh-btn" onclick="adminManager.loadDeposits()">Refresh</button>
+                </div>
+                <div class="filter-bar">
+                    <select id="depositStatusFilter" onchange="adminManager.filterDeposits()">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="deposits-list" id="depositsList">
+                    <!-- Deposits will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Withdrawals Management Tab -->
+            <div id="withdrawalsTab" class="tab-content">
+                <div class="section-header">
+                    <h3>Withdrawal Management</h3>
+                    <button class="refresh-btn" onclick="adminManager.loadWithdrawals()">Refresh</button>
+                </div>
+                <div class="filter-bar">
+                    <select id="withdrawalStatusFilter" onchange="adminManager.filterWithdrawals()">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="withdrawals-list" id="withdrawalsList">
+                    <!-- Withdrawals will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Balance Management Tab -->
+            <div id="balancesTab" class="tab-content">
+                <div class="section-header">
+                    <h3>Balance Management</h3>
+                </div>
+                <div class="balance-adjustment">
+                    <h4>Adjust User Balance</h4>
+                    <div class="form-row">
+                        <input type="text" id="balanceUserId" placeholder="User ID">
+                        <input type="number" id="balanceAmount" placeholder="Amount (+ or -)" step="0.01">
+                        <input type="text" id="balanceReason" placeholder="Reason">
+                        <button onclick="adminManager.adjustBalance()">Apply</button>
+                    </div>
+                </div>
+                <div class="balance-history" id="balanceHistory">
+                    <h4>Recent Balance Changes</h4>
+                    <div id="balanceHistoryList">
+                        <!-- Balance history will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Settings Tab -->
+            <div id="settingsTab" class="tab-content">
+                <div class="section-header">
+                    <h3>System Settings</h3>
+                    <button class="refresh-btn" onclick="adminManager.loadSettings()">Refresh</button>
+                </div>
+                <div class="settings-form" id="settingsForm">
+                    <!-- Settings will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Admin Logs Tab -->
+            <div id="logsTab" class="tab-content">
+                <div class="section-header">
+                    <h3>Admin Activity Logs</h3>
+                    <button class="refresh-btn" onclick="adminManager.loadLogs()">Refresh</button>
+                </div>
+                <div class="logs-list" id="logsList">
+                    <!-- Logs will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing users/deposits/withdrawals -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Edit</h3>
+                <span class="close" onclick="adminManager.closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button onclick="adminManager.closeModal()">Cancel</button>
+                <button id="modalSaveBtn" onclick="adminManager.saveModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
