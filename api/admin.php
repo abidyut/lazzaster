@@ -2,99 +2,166 @@
 header('Content-Type: application/json');
 require_once '../config.php';
 
-// Admin credentials - In production, these should be stored securely in database
-$ADMIN_CREDENTIALS = [
-    'admin' => password_hash('admin123', PASSWORD_DEFAULT), // Default admin/admin123
-    // Add more admin users as needed
-];
+// Enable detailed error reporting for development
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors to client
+
+// Cleanup expired tokens on each request
+try {
+    $db = getDB();
+    cleanupExpiredTokens($db);
+} catch (Exception $e) {
+    error_log("Token cleanup failed: " . $e->getMessage());
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $action = $data['action'] ?? '';
+    $rawInput = file_get_contents('php://input');
+    $data = json_decode($rawInput, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        echo json_encode(['success' => false, 'message' => 'Invalid JSON data']);
+        exit;
+    }
+    
+    $action = sanitizeInput($data['action'] ?? '');
 
     try {
         $db = getDB();
         
         // Handle login separately (doesn't require token)
         if ($action === 'login') {
-            handleLogin($data, $ADMIN_CREDENTIALS, $db);
+            handleSecureLogin($db, $data);
             exit;
         }
 
-        // For all other actions, verify admin token
-        $headers = getallheaders();
-        $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : '';
-        
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            echo json_encode(['success' => false, 'message' => 'Missing authorization header']);
+        // For all other actions, verify admin token with role-based permissions
+        $authResult = verifyAdminAuth($db);
+        if (!$authResult['success']) {
+            echo json_encode($authResult);
             exit;
         }
         
-        $token = substr($authHeader, 7); // Remove 'Bearer ' prefix
+        $adminData = $authResult['admin'];
         
-        // Verify admin token (you might want to store admin tokens in database)
-        $stmt = $db->prepare("SELECT id, username FROM users WHERE auth_token = ? AND username IN ('admin')");
-        $stmt->execute([$token]);
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Log all admin actions
+        logAdminAction($db, $adminData['user_id'], $action, $data, $data['user_id'] ?? null);
         
-        if (!$admin) {
-            echo json_encode(['success' => false, 'message' => 'Invalid token']);
-            exit;
-        }
-
-        // Log admin action
-        logAdminAction($db, $admin['id'], $action, $data);
-        
-        // Route to appropriate handler
+        // Route to appropriate handler with permission checks
         switch ($action) {
+            case 'logout':
+                handleLogout($db, $adminData);
+                break;
             case 'get_users':
+                requirePermission($adminData['permissions'], 'users', 'read');
                 getUsersData($db);
                 break;
             case 'update_user_status':
-                updateUserStatus($db, $data, $admin['id']);
+                requirePermission($adminData['permissions'], 'users', 'write');
+                updateUserStatus($db, $data, $adminData['user_id']);
                 break;
             case 'update_user':
-                updateUser($db, $data, $admin['id']);
+                requirePermission($adminData['permissions'], 'users', 'write');
+                updateUser($db, $data, $adminData['user_id']);
                 break;
             case 'get_deposits':
+                requirePermission($adminData['permissions'], 'deposits', 'read');
                 getDepositsData($db);
                 break;
             case 'update_deposit_status':
-                updateDepositStatus($db, $data, $admin['id']);
+                requirePermission($adminData['permissions'], 'deposits', 'approve');
+                updateDepositStatus($db, $data, $adminData['user_id']);
                 break;
             case 'get_withdrawals':
+                requirePermission($adminData['permissions'], 'withdrawals', 'read');
                 getWithdrawalsData($db);
                 break;
             case 'update_withdrawal_status':
-                updateWithdrawalStatus($db, $data, $admin['id']);
+                requirePermission($adminData['permissions'], 'withdrawals', 'approve');
+                updateWithdrawalStatus($db, $data, $adminData['user_id']);
                 break;
             case 'adjust_balance':
-                adjustUserBalance($db, $data, $admin['id']);
+                requirePermission($adminData['permissions'], 'balances', 'adjust');
+                adjustUserBalance($db, $data, $adminData['user_id']);
                 break;
             case 'get_balance_history':
+                requirePermission($adminData['permissions'], 'balances', 'read');
                 getBalanceHistory($db);
                 break;
             case 'get_settings':
+                requirePermission($adminData['permissions'], 'settings', 'read');
                 getSystemSettings($db);
                 break;
             case 'update_settings':
-                updateSystemSettings($db, $data, $admin['id']);
+                requirePermission($adminData['permissions'], 'settings', 'write');
+                updateSystemSettings($db, $data, $adminData['user_id']);
                 break;
             case 'get_logs':
+                requirePermission($adminData['permissions'], 'logs', 'read');
                 getAdminLogs($db);
                 break;
             default:
                 echo json_encode(['success' => false, 'message' => 'Unknown action']);
         }
         
-    } catch(PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    } catch (PermissionException $e) {
+        echo json_encode(['success' => false, 'message' => 'Access denied: ' . $e->getMessage()]);
+    } catch (PDOException $e) {
+        error_log("Database error in admin.php: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Database error occurred']);
+    } catch (Exception $e) {
+        error_log("General error in admin.php: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'An error occurred']);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
 }
 
-function handleLogin($data, $adminCredentials, $db) {
+// Custom exception for permission errors
+class PermissionException extends Exception {}
+
+function requirePermission($permissions, $resource, $action) {
+    if (!checkPermission($permissions, $resource, $action)) {
+        throw new PermissionException("Insufficient permissions for $resource:$action");
+    }
+}
+
+function verifyAdminAuth($db) {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? '';
+    
+    if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+        return ['success' => false, 'message' => 'Missing authorization header'];
+    }
+    
+    $token = substr($authHeader, 7); // Remove 'Bearer ' prefix
+    
+    // Validate token using secure token system
+    $tokenData = validateSecureToken($db, $token, 'admin');
+    
+    if (!$tokenData) {
+        return ['success' => false, 'message' => 'Invalid or expired token'];
+    }
+    
+    if ($tokenData['status'] !== 'active') {
+        return ['success' => false, 'message' => 'Admin account is not active'];
+    }
+    
+    if (!hasAdminAccess($tokenData['permissions'])) {
+        return ['success' => false, 'message' => 'User does not have admin access'];
+    }
+    
+    return [
+        'success' => true,
+        'admin' => [
+            'user_id' => $tokenData['user_id'],
+            'username' => $tokenData['username'],
+            'role_name' => $tokenData['role_name'],
+            'permissions' => $tokenData['permissions']
+        ]
+    ];
+}
+
+function handleSecureLogin($db, $data) {
     $username = sanitizeInput($data['username'] ?? '');
     $password = $data['password'] ?? '';
     
@@ -103,48 +170,96 @@ function handleLogin($data, $adminCredentials, $db) {
         return;
     }
     
-    // Check admin credentials
-    if (!isset($adminCredentials[$username])) {
-        echo json_encode(['success' => false, 'message' => 'Invalid admin credentials']);
+    // Rate limiting - check recent failed attempts
+    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '';
+    $stmt = $db->prepare("
+        SELECT COUNT(*) as failed_attempts 
+        FROM admin_logs 
+        WHERE action = 'failed_login' 
+        AND ip_address = ? 
+        AND created_at > NOW() - INTERVAL '15 minutes'
+    ");
+    $stmt->execute([$ipAddress]);
+    $failedAttempts = $stmt->fetch(PDO::FETCH_ASSOC)['failed_attempts'];
+    
+    if ($failedAttempts >= 5) {
+        logAdminAction($db, null, 'rate_limited_login', ['ip' => $ipAddress, 'username' => $username]);
+        echo json_encode(['success' => false, 'message' => 'Too many failed attempts. Please try again later.']);
         return;
     }
     
-    if (!password_verify($password, $adminCredentials[$username])) {
-        echo json_encode(['success' => false, 'message' => 'Invalid admin credentials']);
-        return;
-    }
+    $db->beginTransaction();
     
-    // Check if admin user exists in database, create if not
-    $stmt = $db->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$admin) {
-        // Create admin user in database
-        $token = generateToken();
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $referralCode = strtoupper(bin2hex(random_bytes(5)));
+    try {
+        // Get user with admin role
+        $stmt = $db->prepare("
+            SELECT u.id, u.username, u.password, u.status, ar.role_name, ar.permissions
+            FROM users u
+            JOIN admin_roles ar ON u.role_id = ar.id
+            WHERE u.username = ? AND u.status = 'active'
+        ");
+        $stmt->execute([$username]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        $stmt = $db->prepare("INSERT INTO users (username, email, password, auth_token, referral_code, status) VALUES (?, ?, ?, ?, ?, 'active')");
-        $stmt->execute([$username, $username . '@admin.local', $hashedPassword, $token, $referralCode]);
+        if (!$admin || !password_verify($password, $admin['password'])) {
+            logAdminAction($db, null, 'failed_login', ['username' => $username, 'ip' => $ipAddress]);
+            $db->commit();
+            echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+            return;
+        }
+        
+        if (!hasAdminAccess($admin['permissions'])) {
+            logAdminAction($db, $admin['id'], 'unauthorized_access', ['username' => $username]);
+            $db->commit();
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+        
+        // Revoke existing admin tokens for this user
+        revokeAllUserTokens($db, $admin['id']);
+        
+        // Create new secure admin token (24 hour expiry)
+        $token = createSecureToken($db, $admin['id'], 'admin', 24);
+        
+        if (!$token) {
+            throw new Exception('Failed to create secure token');
+        }
+        
+        // Update last login
+        $stmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+        $stmt->execute([$admin['id']]);
+        
+        logAdminAction($db, $admin['id'], 'successful_login', ['ip' => $ipAddress]);
+        
+        $db->commit();
         
         echo json_encode([
             'success' => true,
-            'message' => 'Admin login successful',
-            'token' => $token
+            'message' => 'Login successful',
+            'token' => $token,
+            'admin' => [
+                'username' => $admin['username'],
+                'role' => $admin['role_name'],
+                'permissions' => json_decode($admin['permissions'], true)
+            ]
         ]);
-    } else {
-        // Update existing admin token
-        $token = generateToken();
-        $stmt = $db->prepare("UPDATE users SET auth_token = ? WHERE id = ?");
-        $stmt->execute([$token, $admin['id']]);
         
-        echo json_encode([
-            'success' => true,
-            'message' => 'Admin login successful',
-            'token' => $token
-        ]);
+    } catch (Exception $e) {
+        $db->rollBack();
+        error_log("Admin login error: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Login failed']);
     }
+}
+
+function handleLogout($db, $adminData) {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? '';
+    $token = substr($authHeader, 7);
+    
+    revokeToken($db, $token, $adminData['user_id']);
+    logAdminAction($db, $adminData['user_id'], 'logout');
+    
+    echo json_encode(['success' => true, 'message' => 'Logout successful']);
 }
 
 function getUsersData($db) {
@@ -153,7 +268,7 @@ function getUsersData($db) {
                (SELECT COUNT(*) FROM deposits WHERE user_id = users.id AND status = 'approved') as total_deposits,
                (SELECT COUNT(*) FROM game_sessions WHERE user_id = users.id) as total_games
         FROM users 
-        WHERE username != 'admin'
+        WHERE role_id IS NULL OR role_id NOT IN (SELECT id FROM admin_roles WHERE role_name IN ('super_admin', 'admin'))
         ORDER BY created_at DESC 
         LIMIT 100
     ");
@@ -172,12 +287,37 @@ function updateUserStatus($db, $data, $adminId) {
         return;
     }
     
-    $stmt = $db->prepare("UPDATE users SET status = ? WHERE id = ? AND username != 'admin'");
-    $result = $stmt->execute([$status, $userId]);
+    $db->beginTransaction();
     
-    if ($result) {
-        echo json_encode(['success' => true, 'message' => 'User status updated successfully']);
-    } else {
+    try {
+        // Prevent modifying admin users
+        $stmt = $db->prepare("
+            SELECT username FROM users 
+            WHERE id = ? AND (role_id IS NULL OR role_id NOT IN (SELECT id FROM admin_roles))
+        ");
+        $stmt->execute([$userId]);
+        
+        if (!$stmt->fetch()) {
+            throw new Exception('Cannot modify admin users');
+        }
+        
+        $stmt = $db->prepare("UPDATE users SET status = ? WHERE id = ?");
+        $result = $stmt->execute([$status, $userId]);
+        
+        if ($result && $stmt->rowCount() > 0) {
+            // Revoke all tokens if user is suspended or banned
+            if (in_array($status, ['suspended', 'banned'])) {
+                revokeAllUserTokens($db, $userId, $adminId);
+            }
+            
+            $db->commit();
+            echo json_encode(['success' => true, 'message' => 'User status updated successfully']);
+        } else {
+            throw new Exception('No rows affected');
+        }
+        
+    } catch (Exception $e) {
+        $db->rollBack();
         echo json_encode(['success' => false, 'message' => 'Failed to update user status']);
     }
 }
@@ -193,28 +333,46 @@ function updateUser($db, $data, $adminId) {
         return;
     }
     
-    // Validate email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         echo json_encode(['success' => false, 'message' => 'Invalid email format']);
         return;
     }
     
-    // Check if username/email already exists for other users
-    $stmt = $db->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND id != ?");
-    $stmt->execute([$username, $email, $userId]);
+    $db->beginTransaction();
     
-    if ($stmt->rowCount() > 0) {
-        echo json_encode(['success' => false, 'message' => 'Username or email already exists']);
-        return;
-    }
-    
-    $stmt = $db->prepare("UPDATE users SET username = ?, email = ?, status = ? WHERE id = ? AND username != 'admin'");
-    $result = $stmt->execute([$username, $email, $status, $userId]);
-    
-    if ($result) {
-        echo json_encode(['success' => true, 'message' => 'User updated successfully']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to update user']);
+    try {
+        // Prevent modifying admin users
+        $stmt = $db->prepare("
+            SELECT username FROM users 
+            WHERE id = ? AND (role_id IS NULL OR role_id NOT IN (SELECT id FROM admin_roles))
+        ");
+        $stmt->execute([$userId]);
+        
+        if (!$stmt->fetch()) {
+            throw new Exception('Cannot modify admin users');
+        }
+        
+        // Check if username/email already exists for other users
+        $stmt = $db->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND id != ?");
+        $stmt->execute([$username, $email, $userId]);
+        
+        if ($stmt->rowCount() > 0) {
+            throw new Exception('Username or email already exists');
+        }
+        
+        $stmt = $db->prepare("UPDATE users SET username = ?, email = ?, status = ? WHERE id = ?");
+        $result = $stmt->execute([$username, $email, $status, $userId]);
+        
+        if ($result && $stmt->rowCount() > 0) {
+            $db->commit();
+            echo json_encode(['success' => true, 'message' => 'User updated successfully']);
+        } else {
+            throw new Exception('No rows affected');
+        }
+        
+    } catch (Exception $e) {
+        $db->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
 }
 
@@ -245,38 +403,51 @@ function updateDepositStatus($db, $data, $adminId) {
     $db->beginTransaction();
     
     try {
-        // Get deposit details
-        $stmt = $db->prepare("SELECT * FROM deposits WHERE id = ?");
+        // Get deposit details with FOR UPDATE lock
+        $stmt = $db->prepare("SELECT * FROM deposits WHERE id = ? FOR UPDATE");
         $stmt->execute([$depositId]);
         $deposit = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$deposit) {
-            $db->rollBack();
-            echo json_encode(['success' => false, 'message' => 'Deposit not found']);
-            return;
+            throw new Exception('Deposit not found');
+        }
+        
+        if ($deposit['status'] !== 'pending') {
+            throw new Exception('Deposit has already been processed');
         }
         
         // Update deposit status
-        $stmt = $db->prepare("UPDATE deposits SET status = ?, admin_notes = ?, processed_at = NOW(), processed_by = ? WHERE id = ?");
+        $stmt = $db->prepare("
+            UPDATE deposits 
+            SET status = ?, admin_notes = ?, processed_at = NOW(), processed_by = ? 
+            WHERE id = ?
+        ");
         $stmt->execute([$status, $adminNotes, $adminId, $depositId]);
         
-        // If approved, add balance to user
-        if ($status === 'approved' && $deposit['status'] === 'pending') {
+        // If approved, update user balance
+        if ($status === 'approved') {
             $stmt = $db->prepare("SELECT balance FROM users WHERE id = ? FOR UPDATE");
             $stmt->execute([$deposit['user_id']]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $currentBalance = $stmt->fetch(PDO::FETCH_ASSOC)['balance'];
             
-            if ($user) {
-                $newBalance = $user['balance'] + $deposit['zst_amount'];
-                
-                // Update user balance
-                $stmt = $db->prepare("UPDATE users SET balance = ? WHERE id = ?");
-                $stmt->execute([$newBalance, $deposit['user_id']]);
-                
-                // Log balance change
-                $stmt = $db->prepare("INSERT INTO balance_history (user_id, delta_amount, previous_balance, new_balance, reason, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
-                $stmt->execute([$deposit['user_id'], $deposit['zst_amount'], $user['balance'], $newBalance, 'deposit_approved']);
-            }
+            $newBalance = $currentBalance + $deposit['zst_amount'];
+            
+            $stmt = $db->prepare("UPDATE users SET balance = ? WHERE id = ?");
+            $stmt->execute([$newBalance, $deposit['user_id']]);
+            
+            // Record balance history
+            $stmt = $db->prepare("
+                INSERT INTO balance_history (user_id, delta_amount, previous_balance, new_balance, reason, transaction_ref) 
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([
+                $deposit['user_id'],
+                $deposit['zst_amount'],
+                $currentBalance,
+                $newBalance,
+                'deposit_approved',
+                'DEP_' . $depositId
+            ]);
         }
         
         $db->commit();
@@ -284,7 +455,7 @@ function updateDepositStatus($db, $data, $adminId) {
         
     } catch (Exception $e) {
         $db->rollBack();
-        echo json_encode(['success' => false, 'message' => 'Failed to update deposit status: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
 }
 
@@ -312,64 +483,91 @@ function updateWithdrawalStatus($db, $data, $adminId) {
         return;
     }
     
-    $stmt = $db->prepare("UPDATE withdrawals SET status = ?, admin_notes = ?, processed_at = NOW(), processed_by = ? WHERE id = ?");
-    $result = $stmt->execute([$status, $adminNotes, $adminId, $withdrawalId]);
+    $db->beginTransaction();
     
-    if ($result) {
+    try {
+        // Get withdrawal details with FOR UPDATE lock
+        $stmt = $db->prepare("SELECT * FROM withdrawals WHERE id = ? FOR UPDATE");
+        $stmt->execute([$withdrawalId]);
+        $withdrawal = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$withdrawal) {
+            throw new Exception('Withdrawal not found');
+        }
+        
+        if (!in_array($withdrawal['status'], ['pending', 'approved'])) {
+            throw new Exception('Withdrawal cannot be modified in current status');
+        }
+        
+        // Update withdrawal status
+        $stmt = $db->prepare("
+            UPDATE withdrawals 
+            SET status = ?, admin_notes = ?, processed_at = NOW(), processed_by = ? 
+            WHERE id = ?
+        ");
+        $stmt->execute([$status, $adminNotes, $adminId, $withdrawalId]);
+        
+        $db->commit();
         echo json_encode(['success' => true, 'message' => 'Withdrawal status updated successfully']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to update withdrawal status']);
+        
+    } catch (Exception $e) {
+        $db->rollBack();
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
 }
 
 function adjustUserBalance($db, $data, $adminId) {
     $userId = (int)($data['user_id'] ?? 0);
-    $delta = floatval($data['delta'] ?? 0);
-    $reason = sanitizeInput($data['reason'] ?? 'admin_adjustment');
+    $amount = (float)($data['amount'] ?? 0);
+    $reason = sanitizeInput($data['reason'] ?? '');
     
-    if (!$userId || $delta == 0) {
-        echo json_encode(['success' => false, 'message' => 'Invalid user ID or delta amount']);
+    if (!$userId || $amount == 0 || empty($reason)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid input data']);
         return;
     }
     
     $db->beginTransaction();
     
     try {
-        // Get user current balance (with lock)
-        $stmt = $db->prepare("SELECT id, username, balance FROM users WHERE id = ? FOR UPDATE");
+        // Get current balance with FOR UPDATE lock
+        $stmt = $db->prepare("SELECT balance FROM users WHERE id = ? FOR UPDATE");
         $stmt->execute([$userId]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $currentBalance = $stmt->fetch(PDO::FETCH_ASSOC)['balance'];
         
-        if (!$user) {
-            $db->rollBack();
-            echo json_encode(['success' => false, 'message' => 'User not found']);
-            return;
+        if ($currentBalance === null) {
+            throw new Exception('User not found');
         }
         
-        $currentBalance = floatval($user['balance']);
-        $newBalance = $currentBalance + $delta;
+        $newBalance = $currentBalance + $amount;
         
-        // Ensure balance doesn't go negative
         if ($newBalance < 0) {
-            $db->rollBack();
-            echo json_encode(['success' => false, 'message' => 'Insufficient balance for this adjustment']);
-            return;
+            throw new Exception('Insufficient balance');
         }
         
         // Update user balance
         $stmt = $db->prepare("UPDATE users SET balance = ? WHERE id = ?");
         $stmt->execute([$newBalance, $userId]);
         
-        // Log the transaction
-        $stmt = $db->prepare("INSERT INTO balance_history (user_id, delta_amount, previous_balance, new_balance, reason, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
-        $stmt->execute([$userId, $delta, $currentBalance, $newBalance, $reason]);
+        // Record balance history
+        $stmt = $db->prepare("
+            INSERT INTO balance_history (user_id, delta_amount, previous_balance, new_balance, reason, transaction_ref) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $userId,
+            $amount,
+            $currentBalance,
+            $newBalance,
+            'admin_adjustment: ' . $reason,
+            'ADJ_' . time() . '_' . $adminId
+        ]);
         
         $db->commit();
         echo json_encode(['success' => true, 'message' => 'Balance adjusted successfully']);
         
     } catch (Exception $e) {
         $db->rollBack();
-        echo json_encode(['success' => false, 'message' => 'Failed to adjust balance: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
 }
 
@@ -379,7 +577,7 @@ function getBalanceHistory($db) {
         FROM balance_history bh 
         JOIN users u ON bh.user_id = u.id 
         ORDER BY bh.created_at DESC 
-        LIMIT 50
+        LIMIT 200
     ");
     $stmt->execute();
     $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -396,18 +594,25 @@ function getSystemSettings($db) {
 }
 
 function updateSystemSettings($db, $data, $adminId) {
-    $settings = $data['settings'] ?? [];
-    
-    if (empty($settings)) {
-        echo json_encode(['success' => false, 'message' => 'No settings provided']);
+    if (!isset($data['settings']) || !is_array($data['settings'])) {
+        echo json_encode(['success' => false, 'message' => 'Invalid settings data']);
         return;
     }
     
     $db->beginTransaction();
     
     try {
-        foreach ($settings as $key => $value) {
-            $stmt = $db->prepare("UPDATE system_settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
+        foreach ($data['settings'] as $setting) {
+            $key = sanitizeInput($setting['key'] ?? '');
+            $value = sanitizeInput($setting['value'] ?? '');
+            
+            if (empty($key)) continue;
+            
+            $stmt = $db->prepare("
+                UPDATE system_settings 
+                SET setting_value = ?, updated_at = NOW() 
+                WHERE setting_key = ?
+            ");
             $stmt->execute([$value, $key]);
         }
         
@@ -416,51 +621,22 @@ function updateSystemSettings($db, $data, $adminId) {
         
     } catch (Exception $e) {
         $db->rollBack();
-        echo json_encode(['success' => false, 'message' => 'Failed to update settings: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Failed to update settings']);
     }
 }
 
 function getAdminLogs($db) {
     $stmt = $db->prepare("
-        SELECT al.*, u.username as admin_username 
+        SELECT al.*, u.username as admin_username, tu.username as target_username
         FROM admin_logs al 
-        LEFT JOIN users u ON al.admin_id = u.id 
+        LEFT JOIN users u ON al.admin_id = u.id
+        LEFT JOIN users tu ON al.target_user_id = tu.id
         ORDER BY al.created_at DESC 
-        LIMIT 100
+        LIMIT 500
     ");
     $stmt->execute();
     $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     echo json_encode(['success' => true, 'data' => $logs]);
-}
-
-function logAdminAction($db, $adminId, $action, $data) {
-    try {
-        $targetUserId = null;
-        $details = null;
-        
-        // Extract target user ID and relevant details based on action
-        switch ($action) {
-            case 'update_user_status':
-            case 'update_user':
-                $targetUserId = $data['user_id'] ?? null;
-                break;
-            case 'update_deposit_status':
-                $targetUserId = null; // Could query deposit to get user_id if needed
-                $details = json_encode(['deposit_id' => $data['deposit_id'] ?? null, 'status' => $data['status'] ?? null]);
-                break;
-            case 'adjust_balance':
-                $targetUserId = $data['user_id'] ?? null;
-                $details = json_encode(['delta' => $data['delta'] ?? null, 'reason' => $data['reason'] ?? null]);
-                break;
-        }
-        
-        $stmt = $db->prepare("INSERT INTO admin_logs (admin_id, action, target_user_id, details, ip_address, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
-        $stmt->execute([$adminId, $action, $targetUserId, $details, $_SERVER['REMOTE_ADDR'] ?? null]);
-        
-    } catch (Exception $e) {
-        // Log error but don't break the main flow
-        error_log("Failed to log admin action: " . $e->getMessage());
-    }
 }
 ?>
