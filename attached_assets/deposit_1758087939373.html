@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - ডিপোজিট</title>
+    <style>
+        /* Bengali font */
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --info: #3498db;
+            --binance: #f0b90b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .topbar {
+            background: linear-gradient(180deg, var(--green), var(--green-dark));
+            color: #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #f0b800);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .top-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .top-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 18px;
+            color: #fff;
+            font-weight: 700;
+            font-size: .85rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,.18);
+        }
+        
+        .balance-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .balance-small {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        /* Form Container */
+        .form-container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.18);
+            margin: 20px 0;
+        }
+        
+        .form-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--green);
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+            color: var(--green-dark);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(247, 201, 74, 0.3);
+        }
+        
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .payment-method {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--gold);
+        }
+        
+        .payment-method.active {
+            border-color: var(--green);
+            background-color: rgba(15, 90, 63, 0.05);
+        }
+        
+        .payment-method.binance.active {
+            border-color: var(--binance);
+        }
+        
+        .payment-details {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
+        }
+        
+        .payment-details.binance-details {
+            border-left-color: var(--binance);
+        }
+        
+        .payment-details.active {
+            display: block;
+        }
+        
+        .payment-info {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .payment-address {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+            border: 1px dashed #ccc;
+        }
+        
+        .agent-info {
+            background: rgba(15, 90, 63, 0.1);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        .agent-number {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--green);
+            margin: 5px 0;
+        }
+        
+        .min-amount {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        
+        .zst-calculation {
+            background: rgba(247, 201, 74, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .zst-amount {
+            font-weight: bold;
+            color: var(--green);
+            font-size: 1.1rem;
+        }
+        
+        .conversion-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--gold);
+        }
+        
+        .conversion-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--green);
+            text-align: center;
+        }
+        
+        .conversion-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .conversion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .conversion-label {
+            color: var(--muted);
+        }
+        
+        .conversion-value {
+            font-weight: bold;
+            color: var(--green);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(180deg, var(--gold-dark), #c2951b);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .message-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+        
+        .message-error {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .note {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-badge">LZ</div>
+        <div class="logo-text">Lazzaster</div>
+        <div class="top-actions">
+            <a href="index.html" class="top-btn">হোম</a>
+            <a href="profile.html" class="top-btn">প্রোফাইল</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="balance-card">
+                <div class="balance-label">আপনার ব্যালেন্স</div>
+                <div class="balance-amount" id="userBalance">0.00 ZST</div>
+                <div class="balance-small">1 ZST = 200 BDT ≈ $0.90 USD</div>
+            </div>
+            
+            <div class="form-container">
+                <h2 class="form-title">ডিপোজিট ফান্ড</h2>
+                
+                <form id="depositForm">
+                    <div class="form-group">
+                        <label class="form-label">পেমেন্ট মেথড</label>
+                        <div class="payment-methods">
+                            <div class="payment-method active" data-method="local">
+                                <div>Local Payment</div>
+                                <div class="min-amount">ন্যূনতম: 2 ZST</div>
+                            </div>
+                            <div class="payment-method" data-method="binance">
+                                <div>Binance</div>
+                                <div class="min-amount">ন্যূনতম: 5 ZST</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="zstAmount" class="form-label">ডিপোজিট পরিমাণ (ZST)</label>
+                        <input type="number" id="zstAmount" class="form-input" placeholder="10" min="2" step="1" required>
+                        <div class="min-amount">ন্যূনতম: 2 ZST</div>
+                    </div>
+                    
+                    <div class="conversion-box">
+                        <div class="conversion-title">ডিপোজিট পরিমাণ সমতুল্য:</div>
+                        <div class="conversion-item">
+                            <span class="conversion-label">BDT:</span>
+                            <span class="conversion-value" id="bdtAmount">0.00</span>
+                        </div>
+                        <div class="conversion-item">
+                            <span class="conversion-label">USD:</span>
+                            <span class="conversion-value" id="usdAmount">0.00</span>
+                        </div>
+                        <div class="conversion-item">
+                            <span class="conversion-label">USDT:</span>
+                            <span class="conversion-value" id="usdtAmount">0.00</span>
+                        </div>
+                        <div class="conversion-item">
+                            <span class="conversion-label">Bitcoin (BTC):</span>
+                            <span class="conversion-value" id="btcAmount">0.00000000</span>
+                        </div>
+                        <div class="conversion-item">
+                            <span class="conversion-label">Ethereum (ETH):</span>
+                            <span class="conversion-value" id="ethAmount">0.000000</span>
+                        </div>
+                        <div class="conversion-item">
+                            <span class="conversion-label">TRON (TRX):</span>
+                            <span class="conversion-value" id="trxAmount">0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-details active" id="local-details">
+                        <div class="payment-info">
+                            আমাদের এজেন্ট নাম্বারে নিচের BDT পরিমাণ পাঠান:
+                        </div>
+                        <div class="agent-info">
+                            <div>এজেন্ট নাম্বার:</div>
+                            <div class="agent-number">০১৭XXXXXXXX</div>
+                            <div>Reference হিসেবে আপনার ইউজারনেম ব্যবহার করুন</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="localTransaction" class="form-label">Transaction ID</label>
+                            <input type="text" id="localTransaction" class="form-input" placeholder="TRX123456789" required>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-details binance-details" id="binance-details">
+                        <div class="payment-info">
+                            Binance থেকে আমাদের Binance ID তে নিচের USDT পরিমাণ পাঠান:
+                        </div>
+                        <div class="agent-info">
+                            <div>আমাদের Binance ID:</div>
+                            <div class="agent-number">LazzasterOfficial</div>
+                            <div>Reference হিসেবে আপনার ইউজারনেম ব্যবহার করুন</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="binanceTransaction" class="form-label">Transaction ID</label>
+                            <input type="text" id="binanceTransaction" class="form-input" placeholder="TRX123456789" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="submitBtn">ডিপোজিট অ্যাপ্লাই করুন</button>
+                </form>
+                
+                <div id="message"></div>
+            </div>
+            
+            <p class="note">
+                ডিপোজিট সম্পূর্ণ হলে ১-২ মিনিটের মধ্যে আপনার অ্যাকাউন্টে ZST যোগ করা হবে।<br>
+                কোন সমস্যা হলে support@lazzaster.gamer.gd এ যোগাযোগ করুন।
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://lazzaster.gamer.gd';
+        const ZST_TO_BDT_RATE = 200; // 1 ZST = 200 BDT
+        const ZST_TO_USD_RATE = 0.90; // 1 ZST = $0.90 USD
+        
+        // Crypto exchange rates (approximate values)
+        const USD_TO_USDT_RATE = 1; // 1 USD = 1 USDT
+        const BTC_TO_USD_RATE = 60000; // 1 BTC = $60,000 USD
+        const ETH_TO_USD_RATE = 3000; // 1 ETH = $3,000 USD
+        const TRX_TO_USD_RATE = 0.12; // 1 TRX = $0.12 USD
+        
+        // DOM elements
+        const depositForm = document.getElementById('depositForm');
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        const paymentDetails = document.querySelectorAll('.payment-details');
+        const userBalance = document.getElementById('userBalance');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+        const zstAmountInput = document.getElementById('zstAmount');
+        
+        // Conversion display elements
+        const bdtAmount = document.getElementById('bdtAmount');
+        const usdAmount = document.getElementById('usdAmount');
+        const usdtAmount = document.getElementById('usdtAmount');
+        const btcAmount = document.getElementById('btcAmount');
+        const ethAmount = document.getElementById('ethAmount');
+        const trxAmount = document.getElementById('trxAmount');
+        
+        // Current user data
+        let currentUser = null;
+        let currentMethod = 'local';
+        
+        // Load user data
+        function loadUserData() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                userBalance.textContent = currentUser.balance + ' ZST';
+            } else {
+                // Redirect to login if not authenticated
+                window.location.href = 'login.html';
+            }
+        }
+        
+        // Calculate all conversions based on ZST amount
+        function calculateConversions() {
+            const zstAmount = parseFloat(zstAmountInput.value) || 0;
+            
+            // Calculate conversions
+            const bdtValue = (zstAmount * ZST_TO_BDT_RATE).toFixed(2);
+            const usdValue = (zstAmount * ZST_TO_USD_RATE).toFixed(2);
+            const usdtValue = (zstAmount * ZST_TO_USD_RATE * USD_TO_USDT_RATE).toFixed(2);
+            const btcValue = (zstAmount * ZST_TO_USD_RATE / BTC_TO_USD_RATE).toFixed(8);
+            const ethValue = (zstAmount * ZST_TO_USD_RATE / ETH_TO_USD_RATE).toFixed(6);
+            const trxValue = (zstAmount * ZST_TO_USD_RATE / TRX_TO_USD_RATE).toFixed(2);
+            
+            // Update display
+            bdtAmount.textContent = bdtValue;
+            usdAmount.textContent = usdValue;
+            usdtAmount.textContent = usdtValue;
+            btcAmount.textContent = btcValue;
+            ethAmount.textContent = ethValue;
+            trxAmount.textContent = trxValue;
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = type === 'success' ? 'message-success' : 
+                                  type === 'error' ? 'message-error' : 'message-info';
+            messageDiv.style.display = 'block';
+        }
+        
+        // Handle payment method selection
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', function() {
+                // Remove active class from all methods
+                paymentMethods.forEach(m => m.classList.remove('active'));
+                paymentDetails.forEach(d => d.classList.remove('active'));
+                
+                // Add active class to clicked method
+                this.classList.add('active');
+                currentMethod = this.dataset.method;
+                
+                // Show corresponding details
+                document.getElementById(`${currentMethod}-details`).classList.add('active');
+            });
+        });
+        
+        // Form submission
+        depositForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const zstAmount = parseFloat(zstAmountInput.value);
+            let transactionData = {};
+            
+            // Validate ZST amount
+            if (!zstAmount) {
+                showMessage('দয়া করে ZST পরিমাণ লিখুন', 'error');
+                return;
+            }
+            
+            if (currentMethod === 'local' && zstAmount < 2) {
+                showMessage('ন্যূনতম ডিপোজিট পরিমাণ 2 ZST', 'error');
+                return;
+            }
+            
+            if (currentMethod === 'binance' && zstAmount < 5) {
+                showMessage('ন্যূনতম ডিপোজিট পরিমাণ 5 ZST', 'error');
+                return;
+            }
+            
+            // Get transaction ID based on method
+            const transactionId = document.getElementById(`${currentMethod}Transaction`).value;
+            
+            if (!transactionId) {
+                showMessage('দয়া করে Transaction ID লিখুন', 'error');
+                return;
+            }
+            
+            // Prepare transaction data
+            transactionData = {
+                method: currentMethod,
+                transaction_id: transactionId,
+                zst_amount: zstAmount,
+                bdt_amount: (zstAmount * ZST_TO_BDT_RATE).toFixed(2),
+                usd_amount: (zstAmount * ZST_TO_USD_RATE).toFixed(2)
+            };
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loader"></span> প্রসেস হচ্ছে...';
+            
+            try {
+                // In a real application, you would send this to your server
+                const response = await fetch(API_BASE_URL + '/api/deposit.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                    },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        username: currentUser.username,
+                        ...transactionData
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('ডিপোজিট রিকুয়েস্ট সফল! আপনার অ্যাকাউন্টে ZST যোগ করা হচ্ছে...', 'success');
+                    
+                    // Simulate processing delay
+                    setTimeout(() => {
+                        showMessage('ডিপোজিট সফল! আপনার অ্যাকাউন্টে ' + zstAmount + ' ZST যোগ করা হয়েছে।', 'success');
+                        
+                        // Update user balance
+                        if (currentUser) {
+                            currentUser.balance = (parseFloat(currentUser.balance) + parseFloat(zstAmount)).toFixed(2);
+                            localStorage.setItem('userData', JSON.stringify(currentUser));
+                            userBalance.textContent = currentUser.balance + ' ZST';
+                        }
+                        
+                        // Reset form
+                        zstAmountInput.value = '';
+                        document.getElementById('localTransaction').value = '';
+                        document.getElementById('binanceTransaction').value = '';
+                        calculateConversions();
+                        
+                        // Redirect to home page after 3 seconds
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 3000);
+                    }, 2000);
+                    
+                } else {
+                    showMessage('ত্রুটি: ' + result.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'ডিপোজিট অ্যাপ্লাই করুন';
+                }
+                
+            } catch (error) {
+                showMessage('নেটওয়ার্ক ত্রুটি। আবার চেষ্টা করুন', 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ডিপোজিট অ্যাপ্লাই করুন';
+                console.error('Deposit error:', error);
+            }
+        });
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            
+            // Add event listeners for amount calculation
+            zstAmountInput.addEventListener('input', calculateConversions);
+            
+            // Initial calculations
+            calculateConversions();
+        });
+    </script>
+</body>
+</html>
