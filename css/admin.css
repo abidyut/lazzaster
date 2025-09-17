@@ -599,3 +599,217 @@ body {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* Dashboard Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--admin-surface);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--admin-shadow);
+    text-align: center;
+}
+
+.stat-card h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--admin-text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--admin-primary);
+}
+
+.activity-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: var(--admin-text);
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--admin-text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Banner Management */
+.banner-management {
+    background: var(--admin-surface);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: var(--admin-shadow);
+}
+
+.banner-upload {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.banner-upload h4 {
+    margin-bottom: 1rem;
+    color: var(--admin-text);
+}
+
+.banner-item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: var(--admin-surface);
+}
+
+.banner-info {
+    flex: 1;
+}
+
+.banner-title {
+    font-weight: 600;
+    color: var(--admin-text);
+    margin-bottom: 0.25rem;
+}
+
+.banner-description {
+    color: var(--admin-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.banner-status {
+    font-size: 0.8rem;
+    color: var(--admin-text-muted);
+}
+
+/* Website Controls */
+.website-controls {
+    display: grid;
+    gap: 2rem;
+}
+
+.control-section {
+    background: var(--admin-surface);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--admin-shadow);
+}
+
+.control-section h4 {
+    margin: 0 0 1rem 0;
+    color: var(--admin-text);
+    border-bottom: 1px solid var(--admin-border);
+    padding-bottom: 0.5rem;
+}
+
+.game-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.game-item label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.game-item input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.config-form {
+    display: grid;
+    gap: 1rem;
+}
+
+.maintenance-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.maintenance-controls label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.maintenance-controls input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.maintenance-controls p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--admin-text-muted);
+}
+
+/* Recent Activity */
+.recent-activity {
+    background: var(--admin-surface);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--admin-shadow);
+    margin-top: 2rem;
+}
+
+.recent-activity h4 {
+    margin: 0 0 1rem 0;
+    color: var(--admin-text);
+    border-bottom: 1px solid var(--admin-border);
+    padding-bottom: 0.5rem;
+}
+
+/* Responsive adjustments for new elements */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .banner-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .website-controls {
+        gap: 1rem;
+    }
+    
+    .control-section {
+        padding: 1rem;
+    }
+}

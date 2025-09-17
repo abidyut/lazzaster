@@ -2,7 +2,7 @@
 class AdminManager {
     constructor() {
         this.API_BASE_URL = window.location.origin;
-        this.currentTab = 'users';
+        this.currentTab = 'dashboard';
         this.adminToken = localStorage.getItem('adminToken');
         this.currentData = {
             users: [],
@@ -18,7 +18,7 @@ class AdminManager {
         // Check if admin is already logged in
         if (this.adminToken) {
             this.showDashboard();
-            this.loadUsers();
+            this.loadDashboard();
         }
 
         // Setup login form
@@ -51,7 +51,7 @@ class AdminManager {
                 this.adminToken = result.token;
                 localStorage.setItem('adminToken', result.token);
                 this.showDashboard();
-                this.loadUsers();
+                this.loadDashboard();
                 messageDiv.textContent = '';
             } else {
                 messageDiv.textContent = result.message || 'Login failed';
@@ -97,6 +97,15 @@ class AdminManager {
         
         // Load data for the selected tab
         switch(tabName) {
+            case 'dashboard':
+                this.loadDashboard();
+                break;
+            case 'banners':
+                this.loadBanners();
+                break;
+            case 'website':
+                this.loadWebsiteSettings();
+                break;
             case 'users':
                 this.loadUsers();
                 break;
@@ -594,6 +603,223 @@ class AdminManager {
         setTimeout(() => {
             document.body.removeChild(messageDiv);
         }, 5000);
+    }
+
+    // Dashboard Management
+    async loadDashboard() {
+        const dashboardStats = document.getElementById('dashboardStats');
+        dashboardStats.innerHTML = '<div class="loading">Loading dashboard...</div>';
+
+        const result = await this.apiCall({ action: 'get_dashboard_stats' });
+        if (result && result.success) {
+            this.renderDashboardStats(result.data);
+            this.loadRecentActivity();
+        } else {
+            dashboardStats.innerHTML = '<div class="message error">Failed to load dashboard</div>';
+        }
+    }
+
+    renderDashboardStats(stats) {
+        const dashboardStats = document.getElementById('dashboardStats');
+        const html = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Total Users</h4>
+                    <div class="stat-number">${stats.total_users || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Pending Deposits</h4>
+                    <div class="stat-number">${stats.pending_deposits || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Pending Withdrawals</h4>
+                    <div class="stat-number">${stats.pending_withdrawals || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Balance</h4>
+                    <div class="stat-number">${stats.total_balance || 0} ZST</div>
+                </div>
+            </div>
+        `;
+        dashboardStats.innerHTML = html;
+    }
+
+    async loadRecentActivity() {
+        const recentActivity = document.getElementById('recentActivity');
+        const result = await this.apiCall({ action: 'get_recent_activity' });
+        if (result && result.success) {
+            this.renderRecentActivity(result.data);
+        }
+    }
+
+    renderRecentActivity(activities) {
+        const recentActivity = document.getElementById('recentActivity');
+        if (!activities || activities.length === 0) {
+            recentActivity.innerHTML = '<div class="message">No recent activity</div>';
+            return;
+        }
+
+        const html = activities.slice(0, 10).map(activity => `
+            <div class="activity-item">
+                <div class="activity-info">
+                    <div class="activity-title">${activity.action}</div>
+                    <div class="activity-time">${new Date(activity.created_at).toLocaleString()}</div>
+                </div>
+            </div>
+        `).join('');
+        
+        recentActivity.innerHTML = html;
+    }
+
+    // Banner Management
+    async loadBanners() {
+        const bannerList = document.getElementById('bannerList');
+        bannerList.innerHTML = '<div class="loading">Loading banners...</div>';
+
+        // For now, show current banners from filesystem
+        const banners = [
+            { id: 1, title: 'সব সদস্যই এজেন্ট', description: 'বন্ধুদের আমন্ত্রণ জানিয়ে কমিশন আয় করুন', image_url: './img/header.png', is_active: true },
+            { id: 2, title: 'দ্রুত ডিপোজিট ও উইথড্র', description: 'মাত্র কয়েক মিনিটে আপনার টাকা নিন', image_url: './img/header2.png', is_active: true },
+            { id: 3, title: 'নিরাপদ ও ফেয়ার গেমিং', description: '১০০% প্রমাণিত ন্যায্য গেম সিস্টেম', image_url: './img/header3.png', is_active: true }
+        ];
+        this.renderBanners(banners);
+    }
+
+    renderBanners(banners) {
+        const bannerList = document.getElementById('bannerList');
+        if (!banners || banners.length === 0) {
+            bannerList.innerHTML = '<div class="message">No banners found</div>';
+            return;
+        }
+
+        const html = banners.map(banner => `
+            <div class="banner-item" style="display: flex; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem;">
+                <img src="${banner.image_url}" alt="${banner.title}" style="width: 100px; height: 60px; object-fit: cover; border-radius: 4px;">
+                <div class="banner-info" style="flex: 1;">
+                    <div class="banner-title" style="font-weight: 600;">${banner.title}</div>
+                    <div class="banner-description" style="color: #64748b; font-size: 0.9rem;">${banner.description}</div>
+                    <div class="banner-status" style="font-size: 0.8rem;">Status: ${banner.is_active ? 'Active' : 'Inactive'}</div>
+                </div>
+                <div class="banner-actions">
+                    <button class="btn-sm ${banner.is_active ? 'btn-warning' : 'btn-success'}" 
+                            onclick="adminManager.showMessage('Banner management coming soon!', 'success')">
+                        ${banner.is_active ? 'Deactivate' : 'Activate'}
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        
+        bannerList.innerHTML = html;
+    }
+
+    async uploadBanner() {
+        this.showMessage('Banner upload feature will be implemented with database setup', 'info');
+    }
+
+    // Website Control Management
+    async loadWebsiteSettings() {
+        const gameControls = document.getElementById('gameControls');
+        const siteConfig = document.getElementById('siteConfig');
+        
+        this.renderGameControls();
+        this.renderSiteConfig();
+        
+        // Set maintenance mode checkbox (default false)
+        const maintenanceCheckbox = document.getElementById('maintenanceMode');
+        maintenanceCheckbox.checked = false;
+    }
+
+    renderGameControls() {
+        const gameControls = document.getElementById('gameControls');
+        
+        const html = `
+            <div class="game-list">
+                <div class="game-item" style="margin-bottom: 0.5rem;">
+                    <label>
+                        <input type="checkbox" id="crashGameEnabled" checked> 
+                        Enable Crash Game
+                    </label>
+                </div>
+                <div class="game-item" style="margin-bottom: 0.5rem;">
+                    <label>
+                        <input type="checkbox" id="diceGameEnabled" checked> 
+                        Enable Dice Game
+                    </label>
+                </div>
+                <div class="game-item" style="margin-bottom: 0.5rem;">
+                    <label>
+                        <input type="checkbox" id="slotsGameEnabled" checked> 
+                        Enable Slots Game
+                    </label>
+                </div>
+                <div class="game-item" style="margin-bottom: 0.5rem;">
+                    <label>
+                        <input type="checkbox" id="coinGameEnabled" checked> 
+                        Enable Coin Game
+                    </label>
+                </div>
+                <div class="game-item" style="margin-bottom: 0.5rem;">
+                    <label>
+                        <input type="checkbox" id="sportsEnabled" checked> 
+                        Enable Sports Betting
+                    </label>
+                </div>
+            </div>
+            <button onclick="adminManager.saveGameSettings()" class="btn-primary" style="margin-top: 1rem;">
+                Save Game Settings
+            </button>
+        `;
+        
+        gameControls.innerHTML = html;
+    }
+
+    renderSiteConfig() {
+        const siteConfig = document.getElementById('siteConfig');
+        
+        const html = `
+            <div class="config-form">
+                <div class="form-group">
+                    <label>Site Title:</label>
+                    <input type="text" id="siteTitle" value="Lazzaster — দ্রুত মিনি-গেমস">
+                </div>
+                <div class="form-group">
+                    <label>Site Description:</label>
+                    <textarea id="siteDescription">বাংলাদেশি টার্গেট ক্যাসিনো-স্টাইল মিনি-গেমস</textarea>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="registrationEnabled" checked>
+                        Registration Enabled
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Minimum Deposit (ZST):</label>
+                    <input type="number" id="minDeposit" value="5" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Minimum Withdrawal (ZST):</label>
+                    <input type="number" id="minWithdrawal" value="10" step="0.01">
+                </div>
+            </div>
+            <button onclick="adminManager.saveSiteConfig()" class="btn-primary" style="margin-top: 1rem;">
+                Save Site Configuration
+            </button>
+        `;
+        
+        siteConfig.innerHTML = html;
+    }
+
+    async saveGameSettings() {
+        this.showMessage('Game settings saved successfully (demo mode)', 'success');
+    }
+
+    async saveSiteConfig() {
+        this.showMessage('Site configuration saved successfully (demo mode)', 'success');
+    }
+
+    async toggleMaintenance() {
+        const isEnabled = document.getElementById('maintenanceMode').checked;
+        this.showMessage(`Maintenance mode ${isEnabled ? 'enabled' : 'disabled'} (demo mode)`, 'success');
     }
 }
 

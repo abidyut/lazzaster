@@ -42,7 +42,10 @@
         <div id="adminDashboard" class="admin-dashboard" style="display: none;">
             <!-- Navigation Tabs -->
             <div class="tab-navigation">
-                <button class="tab-btn active" onclick="adminManager.showTab('users')">Users</button>
+                <button class="tab-btn active" onclick="adminManager.showTab('dashboard')">Dashboard</button>
+                <button class="tab-btn" onclick="adminManager.showTab('banners')">Banner Control</button>
+                <button class="tab-btn" onclick="adminManager.showTab('website')">Website Control</button>
+                <button class="tab-btn" onclick="adminManager.showTab('users')">Users</button>
                 <button class="tab-btn" onclick="adminManager.showTab('deposits')">Deposits</button>
                 <button class="tab-btn" onclick="adminManager.showTab('withdrawals')">Withdrawals</button>
                 <button class="tab-btn" onclick="adminManager.showTab('balances')">Balances</button>
@@ -50,8 +53,79 @@
                 <button class="tab-btn" onclick="adminManager.showTab('logs')">Logs</button>
             </div>
 
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="tab-content active">
+                <div class="section-header">
+                    <h3>Dashboard Overview</h3>
+                    <button class="refresh-btn" onclick="adminManager.loadDashboard()">Refresh</button>
+                </div>
+                <div class="dashboard-stats" id="dashboardStats">
+                    <!-- Dashboard stats will be loaded here -->
+                </div>
+                <div class="recent-activity">
+                    <h4>Recent Activity</h4>
+                    <div id="recentActivity">
+                        <!-- Recent activity will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner Control Tab -->
+            <div id="bannersTab" class="tab-content">
+                <div class="section-header">
+                    <h3>Banner & Slider Management</h3>
+                    <button class="refresh-btn" onclick="adminManager.loadBanners()">Refresh</button>
+                </div>
+                <div class="banner-management">
+                    <div class="banner-upload">
+                        <h4>Upload New Banner</h4>
+                        <div class="form-row">
+                            <input type="file" id="bannerFile" accept="image/*">
+                            <input type="text" id="bannerTitle" placeholder="Banner Title (Bengali)">
+                            <input type="text" id="bannerDescription" placeholder="Banner Description (Bengali)">
+                            <button onclick="adminManager.uploadBanner()">Upload Banner</button>
+                        </div>
+                    </div>
+                    <div class="banner-list" id="bannerList">
+                        <!-- Current banners will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Website Control Tab -->
+            <div id="websiteTab" class="tab-content">
+                <div class="section-header">
+                    <h3>Website Content Management</h3>
+                    <button class="refresh-btn" onclick="adminManager.loadWebsiteSettings()">Refresh</button>
+                </div>
+                <div class="website-controls">
+                    <div class="control-section">
+                        <h4>Games Management</h4>
+                        <div class="game-controls" id="gameControls">
+                            <!-- Game controls will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="control-section">
+                        <h4>Site Configuration</h4>
+                        <div class="site-config" id="siteConfig">
+                            <!-- Site configuration will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="control-section">
+                        <h4>Maintenance Mode</h4>
+                        <div class="maintenance-controls">
+                            <label for="maintenanceMode">
+                                <input type="checkbox" id="maintenanceMode" onchange="adminManager.toggleMaintenance()">
+                                Enable Maintenance Mode
+                            </label>
+                            <p>When enabled, only admins can access the website.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Users Management Tab -->
-            <div id="usersTab" class="tab-content active">
+            <div id="usersTab" class="tab-content">
                 <div class="section-header">
                     <h3>User Management</h3>
                     <button class="refresh-btn" onclick="adminManager.loadUsers()">Refresh</button>

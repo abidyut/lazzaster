@@ -207,5 +207,74 @@ function showLoginModal() {
   }
 })();
 </script>
+
+<script>
+// Banner slider initialization
+document.addEventListener('DOMContentLoaded', () => {
+  const banner = document.querySelector('.banner');
+  if (!banner) return;
+  banner.innerHTML = `
+    <div class="banner-slider">
+      <div class="banner-slide active">
+        <img src="./img/header.png" alt="Lazzaster Banner 1">
+        <div class="banner-content">
+          <h3>সব সদস্যই এজেন্ট</h3>
+          <p>বন্ধুদের আমন্ত্রণ জানিয়ে কমিশন আয় করুন</p>
+        </div>
+      </div>
+      <div class="banner-slide">
+        <img src="./img/header2.png" alt="Lazzaster Banner 2">
+        <div class="banner-content">
+          <h3>দ্রুত ডিপোজিট ও উইথড্র</h3>
+          <p>মাত্র কয়েক মিনিটে আপনার টাকা নিন</p>
+        </div>
+      </div>
+      <div class="banner-slide">
+        <img src="./img/header3.png" alt="Lazzaster Banner 3">
+        <div class="banner-content">
+          <h3>নিরাপদ ও ফেয়ার গেমিং</h3>
+          <p>১০০% প্রমাণিত ন্যায্য গেম সিস্টেম</p>
+        </div>
+      </div>
+    </div>
+    <div class="banner-nav">
+      <div class="banner-dot active" data-i="0"></div>
+      <div class="banner-dot" data-i="1"></div>
+      <div class="banner-dot" data-i="2"></div>
+    </div>`;
+  
+  // Initialize slider functionality
+  const slides = banner.querySelectorAll('.banner-slide');
+  const dots = banner.querySelectorAll('.banner-dot');
+  let currentSlide = 0;
+  const totalSlides = slides.length;
+  let timer;
+  
+  const goToSlide = (slideIndex) => {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('active');
+    currentSlide = (slideIndex + totalSlides) % totalSlides;
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+  };
+  
+  // Add click handlers to dots
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      goToSlide(parseInt(dot.dataset.i));
+      resetTimer();
+    });
+  });
+  
+  // Auto-advance slides
+  const nextSlide = () => goToSlide(currentSlide + 1);
+  const resetTimer = () => {
+    clearInterval(timer);
+    timer = setInterval(nextSlide, 4000); // Change slide every 4 seconds
+  };
+  
+  resetTimer();
+});
+</script>
 </body>
 </html>
