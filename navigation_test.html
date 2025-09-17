@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Test - Lazzaster</title>
+    <style>
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./Kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-header {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,.1);
+        }
+        
+        .section-title {
+            color: var(--green);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(15, 90, 63, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--green);
+        }
+        
+        .test-link {
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 120px;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .test-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.2);
+        }
+        
+        .test-desc {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        
+        .status-ok {
+            background: #2ecc71;
+        }
+        
+        .status-pending {
+            background: #f39c12;
+        }
+        
+        .critical-test {
+            background: rgba(231, 76, 60, 0.1);
+            border-left-color: #e74c3c;
+        }
+        
+        .instruction-box {
+            background: rgba(247, 201, 74, 0.1);
+            border: 2px solid var(--gold);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+        
+        .auto-test-btn {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px 5px;
+        }
+        
+        .auto-test-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🔍 Lazzaster Navigation Test Suite</h1>
+        <p>Comprehensive test to verify all navigation links work bi-directionally</p>
+    </div>
+
+    <div class="instruction-box">
+        <h3>📋 Test Instructions:</h3>
+        <ol style="margin-left: 20px; margin-top: 10px;">
+            <li>Click each link below to verify it loads correctly</li>
+            <li>On each page, verify the navigation elements work (header, footer, bottom nav)</li>
+            <li>Test that you can navigate back to other pages from any page</li>
+            <li>Use the automated tests to verify link functionality</li>
+        </ol>
+    </div>
+
+    <!-- Main Pages Test -->
+    <div class="test-section">
+        <div class="section-title">🏠 Main Navigation Pages</div>
+        <div class="test-grid">
+            <div class="test-item">
+                <a href="index.html" class="test-link">হোম</a>
+                <div class="test-desc">Main homepage with categories and games</div>
+                <div class="status-indicator status-ok"></div>
+            </div>
+            <div class="test-item">
+                <a href="promo.html" class="test-link">প্রোমো</a>
+                <div class="test-desc">Promotional offers and bonuses</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+            <div class="test-item critical-test">
+                <a href="deposit.html" class="test-link">ডিপোজিট</a>
+                <div class="test-desc">CRITICAL: Deposit page (was "খেলা")</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+            <div class="test-item">
+                <a href="rewards.html" class="test-link">পুরস্কার</a>
+                <div class="test-desc">Rewards and achievements</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+            <div class="test-item">
+                <a href="profile.html" class="test-link">অ্যাকাউন্ট</a>
+                <div class="test-desc">User profile and account settings</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support & Legal Pages Test -->
+    <div class="test-section">
+        <div class="section-title">📋 Support & Legal Pages</div>
+        <div class="test-grid">
+            <div class="test-item">
+                <a href="fairness.html" class="test-link">Fairness</a>
+                <div class="test-desc">Game fairness and verification</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+            <div class="test-item">
+                <a href="support.html" class="test-link">Support</a>
+                <div class="test-desc">Customer support and FAQ</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+            <div class="test-item">
+                <a href="privacy.html" class="test-link">Privacy Policy</a>
+                <div class="test-desc">Privacy policy and data protection</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+            <div class="test-item">
+                <a href="aml.html" class="test-link">AML Policy</a>
+                <div class="test-desc">Anti-money laundering policy</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+            <div class="test-item">
+                <a href="terms.html" class="test-link">Terms of Service</a>
+                <div class="test-desc">Terms and conditions</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Pages Test -->
+    <div class="test-section">
+        <div class="section-title">🔐 Authentication Pages</div>
+        <div class="test-grid">
+            <div class="test-item">
+                <a href="login.html" class="test-link">লগইন</a>
+                <div class="test-desc">User login page</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+            <div class="test-item">
+                <a href="signup.html" class="test-link">সাইনআপ</a>
+                <div class="test-desc">User registration page</div>
+                <div class="status-indicator status-pending"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Automated Tests -->
+    <div class="test-section">
+        <div class="section-title">🤖 Automated Navigation Tests</div>
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="auto-test-btn" onclick="testAllLinks()">Test All Links</button>
+            <button class="auto-test-btn" onclick="testBottomNavigation()">Test Bottom Nav</button>
+            <button class="auto-test-btn" onclick="testFooterLinks()">Test Footer Links</button>
+            <button class="auto-test-btn" onclick="testHeaderNavigation()">Test Header/Logo</button>
+        </div>
+        
+        <div class="results-section">
+            <h4>Test Results:</h4>
+            <div id="test-results"></div>
+        </div>
+    </div>
+
+    <!-- Critical Navigation Elements Checklist -->
+    <div class="test-section">
+        <div class="section-title">✅ Critical Navigation Elements Checklist</div>
+        <div class="instruction-box">
+            <h4>For each page, verify these elements exist and work:</h4>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Clickable Logo/Header:</strong> Logo and "Lazzaster" text should link to index.html</li>
+                <li><strong>Bottom Navigation:</strong> 5 buttons (হোম, প্রোমো, ডিপোজিট, পুরস্কার, অ্যাকাউন্ট)</li>
+                <li><strong>Site Footer:</strong> Support and About Us sections with working links</li>
+                <li><strong>Floating Chat:</strong> Chat button should be visible</li>
+                <li><strong>Consistent Styling:</strong> All navigation elements styled consistently</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Automated test functions
+        function testAllLinks() {
+            const links = [
+                'index.html', 'promo.html', 'deposit.html', 'rewards.html', 'profile.html',
+                'fairness.html', 'support.html', 'privacy.html', 'aml.html', 'terms.html',
+                'login.html', 'signup.html'
+            ];
+            
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<h5>Testing all main navigation links...</h5>';
+            
+            links.forEach((link, index) => {
+                setTimeout(() => {
+                    testLink(link, results);
+                }, index * 100);
+            });
+        }
+        
+        function testLink(url, resultsContainer) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result-item';
+            resultDiv.innerHTML = `
+                <span style="margin-right: 10px;">Testing ${url}...</span>
+                <div class="status-indicator status-pending"></div>
+            `;
+            resultsContainer.appendChild(resultDiv);
+            
+            fetch(url)
+                .then(response => {
+                    const status = response.ok ? 'status-ok' : 'status-error';
+                    const statusText = response.ok ? 'OK' : 'FAILED';
+                    resultDiv.innerHTML = `
+                        <span style="margin-right: 10px;">${url}: ${statusText} (${response.status})</span>
+                        <div class="status-indicator ${status}"></div>
+                    `;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `
+                        <span style="margin-right: 10px;">${url}: ERROR (${error.message})</span>
+                        <div class="status-indicator" style="background: #e74c3c;"></div>
+                    `;
+                });
+        }
+        
+        function testBottomNavigation() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<h5>Testing bottom navigation structure...</h5>';
+            
+            const bottomNavItems = [
+                { text: 'হোম', url: 'index.html' },
+                { text: 'প্রোমো', url: 'promo.html' },
+                { text: 'ডিপোজিট', url: 'deposit.html' },
+                { text: 'পুরস্কার', url: 'rewards.html' },
+                { text: 'অ্যাকাউন্ট', url: 'profile.html' }
+            ];
+            
+            bottomNavItems.forEach(item => {
+                testLink(item.url, results);
+            });
+        }
+        
+        function testFooterLinks() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<h5>Testing footer links...</h5>';
+            
+            const footerLinks = [
+                'fairness.html', 'support.html', 'privacy.html', 'aml.html', 'terms.html'
+            ];
+            
+            footerLinks.forEach(link => {
+                testLink(link, results);
+            });
+        }
+        
+        function testHeaderNavigation() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<h5>Testing header/logo navigation...</h5>';
+            
+            testLink('index.html', results);
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result-item';
+            resultDiv.innerHTML = `
+                <span style="margin-right: 10px;">Manual Test: Click logo/header on any page should return to index.html</span>
+                <div class="status-indicator status-pending"></div>
+            `;
+            results.appendChild(resultDiv);
+        }
+        
+        // Auto-run basic test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                testAllLinks();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
