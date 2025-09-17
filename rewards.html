@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - পুরস্কার</title>
+    <style>
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./Kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .topbar {
+            background: linear-gradient(180deg, var(--green), var(--green-dark));
+            color: #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #f0b800);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .top-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .top-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 18px;
+            color: #fff;
+            font-weight: 700;
+            font-size: .85rem;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .page-title {
+            text-align: center;
+            color: var(--green);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+        
+        .reward-section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.1);
+            margin: 15px 0;
+        }
+        
+        .section-title {
+            color: var(--green);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .reward-item:last-child {
+            border-bottom: none;
+        }
+        
+        .reward-desc {
+            flex: 1;
+        }
+        
+        .reward-title {
+            font-weight: bold;
+            color: var(--green);
+        }
+        
+        .reward-detail {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        
+        .reward-amount {
+            font-weight: bold;
+            color: var(--gold-dark);
+            font-size: 1.1rem;
+        }
+        
+        .claim-btn {
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .claim-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .leaderboard {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .leaderboard-title {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        
+        .leader-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .leader-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-badge">LZ</div>
+        <div class="logo-text">Lazzaster</div>
+        <div class="top-actions">
+            <a href="index.html" class="top-btn">হোম</a>
+            <a href="deposit.html" class="top-btn">ডিপোজিট</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <h1 class="page-title">🏆 পুরস্কার</h1>
+            
+            <div class="reward-section">
+                <div class="section-title">দৈনিক পুরস্কার</div>
+                <div class="reward-item">
+                    <div class="reward-desc">
+                        <div class="reward-title">দৈনিক লগইন</div>
+                        <div class="reward-detail">প্রতিদিন লগইন করে বোনাস পান</div>
+                    </div>
+                    <div class="reward-amount">+0.50 ZST</div>
+                    <button class="claim-btn">সংগ্রহ</button>
+                </div>
+                <div class="reward-item">
+                    <div class="reward-desc">
+                        <div class="reward-title">সাপ্তাহিক স্ট্রিক</div>
+                        <div class="reward-detail">৭ দিন একটানা লগইন</div>
+                    </div>
+                    <div class="reward-amount">+5.00 ZST</div>
+                    <button class="claim-btn" disabled>৩/৭ দিন</button>
+                </div>
+            </div>
+            
+            <div class="reward-section">
+                <div class="section-title">গেম পুরস্কার</div>
+                <div class="reward-item">
+                    <div class="reward-desc">
+                        <div class="reward-title">প্রথম জয়</div>
+                        <div class="reward-detail">প্রথমবার গেম জিতুন</div>
+                    </div>
+                    <div class="reward-amount">+2.00 ZST</div>
+                    <button class="claim-btn" disabled>অসম্পূর্ণ</button>
+                </div>
+                <div class="reward-item">
+                    <div class="reward-desc">
+                        <div class="reward-title">বড় জয়</div>
+                        <div class="reward-detail">১০x বা তার বেশি জিতুন</div>
+                    </div>
+                    <div class="reward-amount">+10.00 ZST</div>
+                    <button class="claim-btn" disabled>অসম্পূর্ণ</button>
+                </div>
+            </div>
+            
+            <div class="leaderboard">
+                <div class="leaderboard-title">🏅 সাপ্তাহিক লিডারবোর্ড</div>
+                <div class="leader-item">
+                    <span>১. প্লেয়ার***</span>
+                    <span>১২৫.৫০ ZST</span>
+                </div>
+                <div class="leader-item">
+                    <span>২. গেমার***</span>
+                    <span>৯৮.২৫ ZST</span>
+                </div>
+                <div class="leader-item">
+                    <span>৩. উইনার***</span>
+                    <span>৭৫.১০ ZST</span>
+                </div>
+                <div style="text-align: center; margin-top: 15px; font-size: 0.9rem; opacity: 0.8;">
+                    টপ ১০ এ থাকুন এবং বোনাস জিতুন!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (authManager.isLoggedIn()) {
+                const userData = authManager.getUserData();
+                const topActions = document.querySelector('.top-actions');
+                if (topActions && userData) {
+                    topActions.innerHTML = `
+                        <a href="deposit.html" class="top-btn">ডিপোজিট</a>
+                        <a href="profile.html" class="top-btn">${userData.balance} ZST</a>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

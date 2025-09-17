@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - AML পলিসি</title>
+    <style>
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./Kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .topbar {
+            background: linear-gradient(180deg, var(--green), var(--green-dark));
+            color: #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #f0b800);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .top-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .top-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 18px;
+            color: #fff;
+            font-weight: 700;
+            font-size: .85rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .page-title {
+            text-align: center;
+            color: var(--green);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+        
+        .content-section {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.1);
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+        
+        .section-title {
+            color: var(--green);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .section-text {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-box {
+            background: rgba(15, 90, 63, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--green);
+            margin: 15px 0;
+        }
+        
+        .warning-box {
+            background: rgba(231, 76, 60, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+            margin: 15px 0;
+        }
+        
+        .last-updated {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-badge">LZ</div>
+        <div class="logo-text">Lazzaster</div>
+        <div class="top-actions">
+            <a href="index.html" class="top-btn">হোম</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <h1 class="page-title">🛡️ AML পলিসি</h1>
+            
+            <div class="content-section">
+                <div class="section-title">অ্যান্টি মানি লন্ডারিং নীতি</div>
+                <div class="section-text">
+                    Lazzaster মানি লন্ডারিং এবং সন্দেহজনক সম্পদ স্থানান্তর রোধে দৃঢ়ভাবে অঙ্গীকারবদ্ধ। আমরা সার্বজনীন এবং স্থানীয় আইন মেনে চলি।
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-title">গ্রাহক যাচাই (KYC)</div>
+                <div class="section-text">
+                    প্রতিটি গ্রাহকের পরিচয় যাচাই আমাদের প্রথম প্রাথমিকতা। আমরা নিম্নলিখিত প্রক্রিয়া অনুসরণ করি:
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>পরিচয় যাচাই প্রক্রিয়া:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>সরকারী পরিচয়পত্র যাচাই</li>
+                        <li>বয়স সত্যতা নিশ্চিতকরণ (১৮+)</li>
+                        <li>আয়ের উৎস যাচাই</li>
+                        <li>ঠিকানা সত্যতা নিশ্চিতকরণ</li>
+                        <li>ব্যাঙ্ক অ্যাকাউন্ট যাচাই</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-title">সন্দেহজনক কার্যকলাপ মনিটরিং</div>
+                <div class="section-text">
+                    আমরা নিম্নলিখিত কার্যকলাপগুলো অত্যন্ত যত্নের সাথে মনিটর করি:
+                </div>
+                
+                <div class="highlight-box">
+                    <ul style="margin-left: 20px;">
+                        <li>অস্বাভাবিক বা বড় পরিমাণের লেনদেন</li>
+                        <li>দ্রুত এবং বারবার জমা-খরচ</li>
+                        <li>মনি লন্ডারিং এর সাথে সম্পর্কিত অদ্ভুত প্যাটার্ন</li>
+                        <li>একাধিক অ্যাকাউন্ট ব্যবহার</li>
+                        <li>বিভিন্ন দেশের সাথে অস্বাভাবিক লেনদেন</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-title">রিপোর্টিং ব্যবস্থা</div>
+                <div class="section-text">
+                    সন্দেহজনক কার্যকলাপের জন্য আমরা নিম্নলিখিত পদক্ষেপ গ্রহণ করি:
+                </div>
+                
+                <div class="highlight-box">
+                    <ul style="margin-left: 20px;">
+                        <li>অ্যাকাউন্ট সাময়িক বা স্থায়ী বন্ধ</li>
+                        <li>লেনদেন স্থগিতকরণ</li>
+                        <li>অতিরিক্ত যাচাই এবং নথি প্রয়োজন</li>
+                        <li>সরকারী কর্তৃপক্ষকে রিপোর্ট</li>
+                        <li>আইন প্রয়োগকারী সংস্থার সাথে সহযোগিতা</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-title">আমাদের দায়িত্ব</div>
+                <div class="section-text">
+                    Lazzaster এর সব কর্মচারীকে AML সম্পর্কে প্রশিক্ষণ দেওয়া হয়। আমরা নিম্নলিখিত দায়িত্ব পালন করি:
+                </div>
+                
+                <div class="highlight-box">
+                    <ul style="margin-left: 20px;">
+                        <li>নিয়মিত কর্মচারী প্রশিক্ষণ</li>
+                        <li>সন্দেহজনক কার্যকলাপ তৎক্ষণাৎ রিপোর্ট করা</li>
+                        <li>গ্রাহক রেকর্ড সঠিক সময়ে আপডেট করা</li>
+                        <li>আইন প্রয়োগকারী সংস্থার সাথে সহযোগিতা</li>
+                        <li>সমস্ত সংশ্লিষ্ট আইন এবং নিয়ম মেনে চলা</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-title">গ্রাহকের দায়িত্ব</div>
+                <div class="section-text">
+                    আমাদের গ্রাহকদের কাছে আমরা আশা করি:
+                </div>
+                
+                <div class="warning-box">
+                    <strong>গ্রাহকের দায়িত্ব:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>সঠিক এবং সত্য তথ্য প্রদান</li>
+                        <li>সন্দেহজনক কার্যকলাপ থেকে বিরত থাকা</li>
+                        <li>শুধুমাত্র আইনি উৎসের অর্থ ব্যবহার</li>
+                        <li>তৎক্ষণাৎ তথ্য আপডেট জানান</li>
+                        <li>আমাদের অনুরোধে সহযোগিতা করা</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-title">যোগাযোগ</div>
+                <div class="section-text">
+                    AML সম্পর্কিত কোনো সন্দেহ বা প্রশ্ন থাকলে আমাদের সাথে তৎক্ষণাৎ যোগাযোগ করুন:
+                </div>
+                
+                <div class="highlight-box">
+                    <p><strong>ইমেইল:</strong> compliance@lazzaster.gamer.gd</p>
+                    <p><strong>হটলাইন:</strong> +৮৮০১XXXXXXXX</p>
+                    <p><strong>সময়:</strong> ২৪ ঘন্টা সেবা</p>
+                </div>
+            </div>
+            
+            <div class="last-updated">
+                শেষ আপডেট: ১৭ সেপ্টেম্বর, ২০২৫
+            </div>
+        </div>
+    </div>
+</body>
+</html>

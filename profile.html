@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - প্রোফাইল</title>
+    <style>
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./Kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .topbar {
+            background: linear-gradient(180deg, var(--green), var(--green-dark));
+            color: #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #f0b800);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .top-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .top-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 18px;
+            color: #fff;
+            font-weight: 700;
+            font-size: .85rem;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 15px;
+            color: var(--green);
+            font-weight: bold;
+        }
+        
+        .profile-name {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .profile-balance {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .profile-section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.1);
+            margin: 15px 0;
+        }
+        
+        .section-title {
+            color: var(--green);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: var(--muted);
+        }
+        
+        .info-value {
+            font-weight: bold;
+            color: var(--green);
+        }
+        
+        .action-btn {
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .referral-section {
+            background: rgba(247, 201, 74, 0.1);
+            border: 2px solid var(--gold);
+        }
+        
+        .referral-code {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--green);
+            margin: 10px 0;
+            border: 1px dashed var(--gold);
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-badge">LZ</div>
+        <div class="logo-text">Lazzaster</div>
+        <div class="top-actions">
+            <a href="index.html" class="top-btn">হোম</a>
+            <a href="deposit.html" class="top-btn">ডিপোজিট</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="profile-header">
+                <div class="profile-avatar" id="userAvatar">👤</div>
+                <div class="profile-name" id="userName">ব্যবহারকারী</div>
+                <div class="profile-balance" id="userBalance">0.00 ZST</div>
+            </div>
+            
+            <div class="profile-section">
+                <div class="section-title">অ্যাকাউন্ট তথ্য</div>
+                <div class="info-row">
+                    <span class="info-label">ইউজারনেম:</span>
+                    <span class="info-value" id="usernameInfo">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">ইমেইল:</span>
+                    <span class="info-value" id="emailInfo">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">সদস্য হওয়ার তারিখ:</span>
+                    <span class="info-value" id="joinDate">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">মোট গেম:</span>
+                    <span class="info-value">০</span>
+                </div>
+            </div>
+            
+            <div class="profile-section referral-section">
+                <div class="section-title">রেফারেল প্রোগ্রাম</div>
+                <p style="margin-bottom: 15px; color: var(--muted);">বন্ধুদের আমন্ত্রণ জানান এবং কমিশন আয় করুন!</p>
+                <div class="referral-code" id="referralCode">আপনার রেফার কোড</div>
+                <button class="action-btn" onclick="copyReferralCode()">কোড কপি করুন</button>
+                <div class="info-row">
+                    <span class="info-label">মোট রেফারেল:</span>
+                    <span class="info-value">০</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">মোট কমিশন:</span>
+                    <span class="info-value">০.০০ ZST</span>
+                </div>
+            </div>
+            
+            <div class="profile-section">
+                <div class="section-title">অ্যাকশন</div>
+                <button class="action-btn" onclick="window.location.href='deposit.html'">ডিপোজিট করুন</button>
+                <button class="action-btn" onclick="refreshBalance()">ব্যালেন্স রিফ্রেশ করুন</button>
+                <button class="action-btn logout-btn" onclick="logout()">লগআউট</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let currentUser = null;
+        
+        function loadUserProfile() {
+            if (!authManager.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = authManager.getUserData();
+            if (currentUser) {
+                // Update profile display
+                document.getElementById('userName').textContent = currentUser.username || 'ব্যবহারকারী';
+                document.getElementById('userBalance').textContent = (currentUser.balance || '0.00') + ' ZST';
+                document.getElementById('usernameInfo').textContent = currentUser.username || '-';
+                document.getElementById('emailInfo').textContent = currentUser.email || '-';
+                document.getElementById('userAvatar').textContent = (currentUser.username || 'U').charAt(0).toUpperCase();
+                
+                // Set referral code (username as referral code)
+                document.getElementById('referralCode').textContent = currentUser.username || 'আপনার কোড';
+                
+                // Set join date if available
+                if (currentUser.created_at) {
+                    const joinDate = new Date(currentUser.created_at).toLocaleDateString('bn-BD');
+                    document.getElementById('joinDate').textContent = joinDate;
+                }
+            }
+        }
+        
+        async function refreshBalance() {
+            const balance = await authManager.getBalance();
+            if (balance !== null) {
+                currentUser.balance = balance;
+                authManager.updateUserData(currentUser);
+                document.getElementById('userBalance').textContent = balance + ' ZST';
+                alert('ব্যালেন্স আপডেট করা হয়েছে!');
+            } else {
+                alert('ব্যালেন্স আপডেট করতে সমস্যা হয়েছে।');
+            }
+        }
+        
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referralCode').textContent;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(referralCode).then(() => {
+                    alert('রেফার কোড কপি করা হয়েছে!');
+                });
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = referralCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('রেফার কোড কপি করা হয়েছে!');
+            }
+        }
+        
+        function logout() {
+            if (confirm('আপনি কি লগআউট করতে চান?')) {
+                authManager.logout();
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserProfile();
+        });
+    </script>
+</body>
+</html>

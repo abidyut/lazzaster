@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - প্রোমো অফার</title>
+    <style>
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./Kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .topbar {
+            background: linear-gradient(180deg, var(--green), var(--green-dark));
+            color: #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #f0b800);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .top-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .top-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 18px;
+            color: #fff;
+            font-weight: 700;
+            font-size: .85rem;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .page-title {
+            text-align: center;
+            color: var(--green);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+        
+        .promo-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.1);
+            margin: 15px 0;
+        }
+        
+        .promo-title {
+            color: var(--green);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .promo-desc {
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .promo-btn {
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .coming-soon {
+            text-align: center;
+            color: var(--muted);
+            padding: 40px 20px;
+            background: #fff;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-badge">LZ</div>
+        <div class="logo-text">Lazzaster</div>
+        <div class="top-actions">
+            <a href="index.html" class="top-btn">হোম</a>
+            <a href="deposit.html" class="top-btn">ডিপোজিট</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <h1 class="page-title">প্রোমো অফার</h1>
+            
+            <div class="promo-card">
+                <div class="promo-title">🎁 স্বাগতম বোনাস</div>
+                <div class="promo-desc">
+                    নতুন সদস্যদের জন্য ১০০% ডিপোজিট বোনাস! প্রথম ডিপোজিটে সর্বোচ্চ ৫০ ZST বোনাস পান।
+                </div>
+                <button class="promo-btn" onclick="window.location.href='deposit.html'">এখনই ডিপোজিট করুন</button>
+            </div>
+            
+            <div class="promo-card">
+                <div class="promo-title">👥 রেফারেল বোনাস</div>
+                <div class="promo-desc">
+                    বন্ধুদের আমন্ত্রণ জানান এবং তাদের প্রতিটি ডিপোজিটে ৫% কমিশন পান। আজীবন আয়ের সুযোগ!
+                </div>
+                <button class="promo-btn">শেয়ার করুন</button>
+            </div>
+            
+            <div class="promo-card">
+                <div class="promo-title">🏆 দৈনিক পুরস্কার</div>
+                <div class="promo-desc">
+                    প্রতিদিন লগইন করুন এবং বিনামূল্যে ZST পান। ধারাবাহিক লগইনে আরও বেশি পুরস্কার!
+                </div>
+                <button class="promo-btn">সংগ্রহ করুন</button>
+            </div>
+            
+            <div class="coming-soon">
+                <h3>আরও অফার শীঘ্রই আসছে...</h3>
+                <p>নতুন প্রোমো অফারের জন্য নিয়মিত চেক করুন</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (authManager.isLoggedIn()) {
+                const userData = authManager.getUserData();
+                const topActions = document.querySelector('.top-actions');
+                if (topActions && userData) {
+                    topActions.innerHTML = `
+                        <a href="deposit.html" class="top-btn">ডিপোজিট</a>
+                        <a href="profile.html" class="top-btn">${userData.balance} ZST</a>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - সাপোর্ট</title>
+    <style>
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./Kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .topbar {
+            background: linear-gradient(180deg, var(--green), var(--green-dark));
+            color: #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #f0b800);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .top-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .top-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 18px;
+            color: #fff;
+            font-weight: 700;
+            font-size: .85rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .page-title {
+            text-align: center;
+            color: var(--green);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+        
+        .content-section {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.1);
+            margin: 20px 0;
+        }
+        
+        .section-title {
+            color: var(--green);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(15, 90, 63, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--green);
+        }
+        
+        .contact-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .contact-info {
+            flex: 1;
+        }
+        
+        .contact-title {
+            font-weight: bold;
+            color: var(--green);
+            margin-bottom: 5px;
+        }
+        
+        .contact-detail {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        
+        .contact-action {
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        
+        .faq-question {
+            font-weight: bold;
+            color: var(--green);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            color: var(--muted);
+            line-height: 1.6;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .faq-answer.active {
+            display: block;
+        }
+        
+        .emergency-box {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .emergency-btn {
+            background: white;
+            color: #e74c3c;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-badge">LZ</div>
+        <div class="logo-text">Lazzaster</div>
+        <div class="top-actions">
+            <a href="index.html" class="top-btn">হোম</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <h1 class="page-title">📞 সাপোর্ট এবং সহায়তা</h1>
+            
+            <div class="content-section">
+                <div class="section-title">যোগাযোগের মাধ্যম</div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">📧</div>
+                    <div class="contact-info">
+                        <div class="contact-title">ইমেইল সাপোর্ট</div>
+                        <div class="contact-detail">২৪ ঘন্টা সাপোর্ট সেবা</div>
+                    </div>
+                    <a href="mailto:support@lazzaster.gamer.gd" class="contact-action">ইমেইল করুন</a>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">💬</div>
+                    <div class="contact-info">
+                        <div class="contact-title">লাইভ চ্যাট</div>
+                        <div class="contact-detail">তত্ক্ষণাৎ সাহায্য পান</div>
+                    </div>
+                    <button class="contact-action" onclick="startLiveChat()">চ্যাট শুরু করুন</button>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">📱</div>
+                    <div class="contact-info">
+                        <div class="contact-title">হটলাইন</div>
+                        <div class="contact-detail">অ্যাকাউন্ট এবং পেমেন্ট সমস্যা</div>
+                    </div>
+                    <a href="tel:+8801XXXXXXXX" class="contact-action">কল করুন</a>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-title">প্রায়শই জিজ্ঞাসা (FAQ)</div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        কিভাবে অ্যাকাউন্ট তৈরি করব? <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        হোম পেজে "একাউন্টখুলুন" বাটনে ক্লিক করুন। এরপর আপনার তথ্য দিয়ে নিবন্ধন সম্পূর্ণ করুন।
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        ডিপোজিট করতে কতক্ষণ সময় লাগে? <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        সাধারণত ১-২ মিনিটের মধ্যে আপনার অ্যাকাউন্টে ZST যুক্ত হয়ে যাবে। দেরি হলে আমাদের সাথে যোগাযোগ করুন।
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        পাসওয়ার্ড ভুলে গেলে কি করব? <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        লগইন পেজে "পাসওয়ার্ড ভুলে গেছে" লিংকে ক্লিক করুন। আপনার ইমেইলে রিসেট লিংক পাঠানো হবে।
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        ZST কি? এর মূল্য কত? <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        ZST হল Lazzaster এর অভ্যন্তরীণ মুদ্রা। বর্তমানে ১ ZST = ২০০ টাকা ≈ $০.৯০ USD।
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        রেফারেল প্রোগ্রাম কিভাবে কাজ করে? <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        আপনার রেফার কোড শেয়ার করুন। আপনার লিংক দিয়ে কেউ নিবন্ধন করলে এবং ডিপোজিট করলে আপনি ৫% কমিশন পাবেন।
+                    </div>
+                </div>
+            </div>
+            
+            <div class="emergency-box">
+                <h3>🆘 জরুরি সাহায্য প্রয়োজন?</h3>
+                <p>অ্যাকাউন্ট লক, পেমেন্ট সমস্যা বা জরুরি সিকিউরিটি সমস্যার জন্য</p>
+                <button class="emergency-btn" onclick="emergencySupport()">তৎক্ষণাৎ সাহায্য পান</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const symbol = element.querySelector('span');
+            
+            if (answer.classList.contains('active')) {
+                answer.classList.remove('active');
+                symbol.textContent = '+';
+            } else {
+                // Close all other FAQs
+                document.querySelectorAll('.faq-answer').forEach(ans => ans.classList.remove('active'));
+                document.querySelectorAll('.faq-question span').forEach(span => span.textContent = '+');
+                
+                // Open this FAQ
+                answer.classList.add('active');
+                symbol.textContent = '-';
+            }
+        }
+        
+        function startLiveChat() {
+            alert('লাইভ চ্যাট সিস্টেম শীঘ্রই সক্রিয় করা হবে। এখনের জন্য ইমেইল করুন।');
+        }
+        
+        function emergencySupport() {
+            window.location.href = 'mailto:emergency@lazzaster.gamer.gd?subject=জরুরি%20সাহায্য&body=অনুগ্রহ%20করে%20আপনার%20সমস্যা%20বর্ণনা%20করুন';
+        }
+    </script>
+</body>
+</html>
