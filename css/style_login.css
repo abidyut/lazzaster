@@ -1,7 +1,7 @@
   /* Bengali font (Kalpurush) */
         @font-face {
             font-family: 'Kalpurush';
-            src: url('./Kalpurush.ttf');
+            src: url('../Kalpurush.ttf');
             font-display: swap;
         }
         

@@ -9,7 +9,19 @@ if (!$db_url) {
 function getDB() {
     try {
         $db_url = getenv('DATABASE_URL');
-        $pdo = new PDO($db_url);
+        
+        // Parse the URL components
+        $url_parts = parse_url($db_url);
+        $host = $url_parts['host'];
+        $port = $url_parts['port'] ?? 5432;
+        $dbname = ltrim($url_parts['path'], '/');
+        $user = $url_parts['user'];
+        $password = $url_parts['pass'];
+        
+        // Build PostgreSQL DSN for PDO
+        $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
+        
+        $pdo = new PDO($dsn, $user, $password);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     } catch(PDOException $e) {

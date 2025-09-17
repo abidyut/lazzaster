@@ -2,14 +2,14 @@
   /* Bengali font (Kalpurush) */
   @font-face {
     font-family: 'Kalpurush';
-    src: url('./Kalpurush.ttf') format('truetype');
+    src: url('../Kalpurush.ttf') format('truetype');
     unicode-range: U+0980-09FF;
     font-display: swap;
   }
   /* English font (Marqana) */
   @font-face {
     font-family: 'Marqana';
-    src: url('./Marqana-d98eE.ttf') format('truetype');
+    src: url('../Marqana-d98eE.ttf') format('truetype');
     unicode-range: U+0020-007F;
     font-display: swap;
   }
