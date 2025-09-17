@@ -2,35 +2,31 @@
 // Database configuration - Using MySQL for InfinityFree hosting
 // Update these with your InfinityFree database credentials from control panel
 
-// MySQL Database Configuration
-// For InfinityFree, typically format is:
-// Host: sql###.epizy.com (from your control panel)
-// Database: epiz_########_dbname
-// Username: epiz_########_username
-// Password: your_password_from_control_panel
+// SQLite Database Configuration for Development
+// Using SQLite for easier setup and development
 
-$db_host = 'localhost';  // Change to your InfinityFree MySQL host (e.g., sql###.epizy.com)
-$db_port = '3306';
-$db_name = 'lazzaster_gaming';  // Change to your InfinityFree database name (e.g., epiz_########_lazzaster)
-$db_user = 'root';              // Change to your InfinityFree username (e.g., epiz_########_user)
-$db_pass = '';                  // Change to your InfinityFree database password
+$db_file = 'database/lazzaster_gaming.db';  // SQLite database file path
 
 // Create connection
 function getDB() {
-    global $db_host, $db_port, $db_name, $db_user, $db_pass;
+    global $db_file;
     
     try {
-        // Build MySQL DSN for PDO with proper options for PHP 8.3
-        $dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4";
+        // Build SQLite DSN for PDO
+        $dsn = "sqlite:" . $db_file;
         
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
+            PDO::ATTR_EMULATE_PREPARES => false
         ];
         
-        $pdo = new PDO($dsn, $db_user, $db_pass, $options);
+        $pdo = new PDO($dsn, null, null, $options);
+        
+        // Enable foreign keys for SQLite
+        $pdo->exec("PRAGMA foreign_keys = ON;");
+        $pdo->exec("PRAGMA journal_mode = WAL;");
+        
         return $pdo;
         
     } catch(PDOException $e) {

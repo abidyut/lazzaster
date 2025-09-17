@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $username = sanitizeInput($data['username']);
     $email = sanitizeInput($data['email']);
-    $password = password_hash($data['password'], PASSWORD_DEFAULT);
+    $password = $data['password']; // Store password as plain text as requested
     $referral = isset($data['referral']) ? sanitizeInput($data['referral']) : null;
     
     // Validate email
