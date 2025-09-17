@@ -1,0 +1,106 @@
+you<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - সাইন আপ</title>
+   <link rel="stylesheet" href="css/style_signup.css">
+   
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="topbar">
+            <div class="logo-badge">LZ</div>
+            <div class="logo-text">Lazzaster</div>
+        </div>
+        
+        <!-- Sign Up Form -->
+        <div class="form-container">
+            <h2 class="form-title">নতুন অ্যাকাউন্ট তৈরি করুন</h2>
+            
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="username" class="form-label">ব্যবহারকারীর নাম</label>
+                    <input type="text" id="username" class="form-input" placeholder="ইউজারনেম (স্পেস ছাড়া)" required>
+                    <div class="error-message" id="username-error">ইউজারনেমে স্পেস ব্যবহার করা যাবে না</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">ইমেইল</label>
+                    <input type="email" id="email" class="form-input" placeholder="আপনার ইমেইল" required>
+                    <div class="error-message" id="email-error">সঠিক ইমেইল দিন</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">পাসওয়ার্ড</label>
+                    <input type="password" id="password" class="form-input" placeholder="পাসওয়ার্ড" required>
+                    <div class="error-message" id="password-error">পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="referral" class="form-label">রেফার কোড (ঐচ্ছিক)</label>
+                    <input type="text" id="referral" class="form-input" placeholder="রেফার কোড">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">সাইন আপ</button>
+            </form>
+            
+            <div class="login-link">
+                ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="login.html">লগইন করুন</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            © 2025 Lazzaster — Responsible gaming: 18+
+        </div>
+    </div>
+<!-- signup.html এর নিচের অংশে -->
+<script>
+// Form submission handling
+document.getElementById('signupForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const referral = document.getElementById('referral').value;
+    
+    // Validation
+    if (username.includes(' ')) {
+        alert('ইউজারনেমে স্পেস ব্যবহার করা যাবে না');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'রেজিস্ট্রেশন করা হচ্ছে...';
+    submitBtn.disabled = true;
+    
+    try {
+        const result = await registerUser(username, email, password, referral);
+        
+        if (result.success) {
+            alert('রেজিস্ট্রেশন সফল! এখন লগইন করুন');
+            window.location.href = 'login.html';
+        } else {
+            alert('Error: ' + result.message);
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    } catch (error) {
+        alert('নেটওয়ার্ক error. আবার চেষ্টা করুন');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+});
+</script>
+<script src="./js/signup.js"></script>
+</body>
+</html>

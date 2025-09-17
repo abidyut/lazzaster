@@ -1,0 +1,126 @@
+
+  /* Bengali font (Kalpurush) */
+  @font-face {
+    font-family: 'Kalpurush';
+    src: url('./Kalpurush.ttf') format('truetype');
+    unicode-range: U+0980-09FF;
+    font-display: swap;
+  }
+  /* English font (Marqana) */
+  @font-face {
+    font-family: 'Marqana';
+    src: url('./Marqana-d98eE.ttf') format('truetype');
+    unicode-range: U+0020-007F;
+    font-display: swap;
+  }
+
+  :root{
+    --green:#0f5a3f;
+    --green-dark:#0c4b35;
+    --gold:#f7c94a;
+    --gold-dark:#d2a621;
+    --bg:#fde9b8;
+    --muted:#6b6b6b;
+    --shadow:0 8px 24px rgba(0,0,0,.18);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:'Marqana','Kalpurush',system-ui,Arial,sans-serif;
+    background:var(--bg);
+    color:#1b2b2b;
+  }
+  .shell{max-width:420px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+  /* header */
+  .topbar{background:linear-gradient(180deg,var(--green),var(--green-dark));color:#fff;padding:12px;display:flex;align-items:center;gap:8px}
+  .logo-badge{width:36px;height:36px;border-radius:8px;background:linear-gradient(180deg,#ffd100,#f0b800);display:grid;place-items:center;font-weight:800}
+  .logo-text{font-size:1.1rem;font-weight:700}
+  .top-actions{margin-left:auto;display:flex;gap:8px}
+  .top-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);padding:6px 12px;border-radius:18px;color:#fff;font-weight:700;font-size:.85rem}
+
+  /* banner */
+  .banner{margin:12px;border-radius:14px;background:linear-gradient(90deg,#fff3d6,#ffe8b0);box-shadow:var(--shadow);padding:14px;display:flex;gap:10px;align-items:center}
+  .banner-art{width:100px;height:80px;border-radius:10px;background:linear-gradient(180deg,#ffd100,#e5b200);display:grid;place-items:center;font-weight:800}
+  .banner h3{margin:0;font-size:1rem}
+  .banner p{margin:6px 0 0;font-size:.85rem;color:var(--muted)}
+
+  /* search */
+  .search-row{display:flex;gap:8px;margin:12px}
+  .search{flex:1;background:#fff;border-radius:999px;padding:8px 12px;display:flex;gap:6px;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+  .search input{border:0;outline:0;width:100%}
+
+  /* pill row */
+  .pill-row{display:flex;gap:8px;margin:0 12px;overflow-x:auto;padding-bottom:6px}
+  .pill{flex:0 0 auto;min-width:70px;padding:8px 12px;border-radius:12px;background:#fff;font-weight:700;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+  .pill.active{background:linear-gradient(180deg,var(--gold),var(--gold-dark));color:#000}
+
+  /* categories */
+  .categories{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:14px 8px}
+  .cat{width:80px;height:80px;border-radius:12px;background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+  .cat .icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(180deg,var(--green),var(--green-dark));color:#fff;display:grid;place-items:center}
+
+  /* hero empty area */
+  .hero{height:200px;margin:12px;border-radius:12px;background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;color:#333;font-weight:700}
+
+  /* chat btn */
+  .float-chat{position:fixed;right:14px;bottom:80px;width:56px;height:56px;border-radius:50%;background:linear-gradient(180deg,var(--green),var(--green-dark));color:#fff;display:grid;place-items:center;box-shadow:0 10px 20px rgba(0,0,0,.25)}
+
+  /* bottom nav */
+  .bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:6px;width:min(420px,96%);background:linear-gradient(180deg,#fff6df,#fff0cc);display:flex;justify-content:space-around;padding:8px;border-radius:30px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .b-item{flex:1;text-align:center;font-size:.8rem;font-weight:700;color:#333;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .b-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(180deg,#ffd100,#e5b200);display:grid;place-items:center}
+.site-footer {
+ 
+  padding: 40px 16px;
+  font-family: Arial, sans-serif;
+}
+.site-footer .container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.site-footer .top-row {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.site-footer .top-row .copyright {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #bfc8d5;
+}
+.site-footer .top-row .copyright a {
+  color: inherit;          /* লিংকের রং parent টেক্সটের মতো হবে */
+  text-decoration: none;   /* underline মুছে যাবে */
+}
+.site-footer .rate {
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+}
+.site-footer .cols {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  margin: 25px 0;
+}
+.site-footer .col h4 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: #dbe5ff;
+}
+.site-footer .col a {
+  display: block;
+  color: #9fb0c8;
+  font-size: 14px;
+  margin: 6px 0;
+  text-decoration: none;
+}
+.site-footer .col a:hover { color: #fff; }
+.site-footer .bottom-row {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 12px;
+  font-size: 13px;
+  text-align: center;
+  color: #9aa6b6;
+}

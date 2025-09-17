@@ -1,0 +1,157 @@
+  /* Bengali font (Kalpurush) */
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./Kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+            --shadow: 0 8px 24px rgba(0,0,0,.18);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Marqana', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .topbar {
+            background: linear-gradient(180deg, var(--green), var(--green-dark));
+            color: #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .logo-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #f0b800);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        /* Form Container */
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--green);
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 700;
+            color: var(--green-dark);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(247, 201, 74, 0.3);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(180deg, var(--gold-dark), #c2951b);
+        }
+        
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .signup-link a {
+            color: var(--green);
+            text-decoration: none;
+            font-weight: 700;
+        }
+        
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }

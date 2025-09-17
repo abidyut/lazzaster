@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - লগইন</title>
+    <link rel="stylesheet" href="css/style_login.css">
+      <script defer src="js/login.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="topbar">
+            <div class="logo-badge">LZ</div>
+            <div class="logo-text">Lazzaster</div>
+        </div>
+        
+        <!-- Login Form -->
+        <div class="form-container">
+            <h2 class="form-title">অ্যাকাউন্টে লগইন করুন</h2>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login" class="form-label">ইউজারনেম বা ইমেইল</label>
+                    <input type="text" id="login" class="form-input" placeholder="ইউজারনেম বা ইমেইল" required>
+                    <div class="error-message" id="login-error">ইউজারনেম বা ইমেইল সঠিক নয়</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password" class="form-label">পাসওয়ার্ড</label>
+                    <input type="password" id="login-password" class="form-input" placeholder="পাসওয়ার্ড" required>
+                    <div class="error-message" id="password-error">পাসওয়ার্ড সঠিক নয়</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">লগইন</button>
+            </form>
+            
+            <div class="signup-link">
+                নতুন ব্যবহারকারী? <a href="index.html">সাইন আপ করুন</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            © 2025 Lazzaster — Responsible gaming: 18+
+        </div>
+    </div>
+<!-- login.html এর নিচের অংশে -->
+<script>
+// Form submission handling
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'লগইন করা হচ্ছে...';
+    submitBtn.disabled = true;
+    
+    try {
+        const result = await loginUser(username, password);
+        
+        if (result.success) {
+            saveAuthData(result.token, result.user);
+            alert('লগইন সফল!');
+            window.location.href = 'index.html'; // হোম পেজে redirect
+        } else {
+            alert('Error: ' + result.message);
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    } catch (error) {
+        alert('নেটওয়ার্ক error. আবার চেষ্টা করুন');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+});
+</script>
+<script src="./js/login.js"></script>
+</body>
+</html>

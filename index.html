@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Lazzaster — দ্রুত মিনি-গেমস (Crash, Dice, Slots) — বাংলাদেশ</title>
+  <meta name="description" content="Lazzaster — বাংলাদেশি টার্গেট ক্যাসিনো-স্টাইল মিনি-গেমস (Crash, Dice,Casino, Slots)">
+  <meta name="keywords" content="Lazzaster, Crash game, Dice, Slots, বাংলাদেশ, অনলাইন গেম, অনলাইন খেলা, অনলাইন ক্যাসিনো,bangldeshi casino website">
+<meta name="theme-color" content="#0f5a3f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230a4b33'/%3E%3Cpath d='M20 65 L50 20 L80 65 L68 80 L50 55 L32 80 Z' fill='%23ffd100'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style_index.css">
+
+</head>
+<body>
+<div class="shell">
+  <!-- header -->
+  <header class="topbar">
+    <div class="logo-badge">LZ</div>
+    <div class="logo-text">Lazzaster</div>
+    <div class="top-actions">
+      <button class="top-btn"><a href="signup.html">একাউন্টখুলুন</a></button>
+      <button class="top-btn">লগইন</button>
+    </div>
+  </header>
+
+  <!-- banner -->
+  <div class="banner">
+    <div class="banner-art"><img src:"./img/header.png";></div>
+    <div>
+      <h3>সব সদস্যই এজেন্ট</h3>
+      <p>বন্ধুদের আমন্ত্রণ জানিয়ে কমিশন আয় করুন</p>
+    </div>
+  </div>
+
+  <!-- search -->
+  <div class="search-row">
+    <div class="search">
+      🔍 <input placeholder="অনুসন্ধান করুন">
+    </div>
+    <button class="top-btn">🎁</button>
+  </div>
+
+  <!-- pill row -->
+  <div class="pill-row">
+    <div class="pill active">লবি</div>
+    <div class="pill">গরম</div>
+    <div class="pill">স্লট</div>
+    <div class="pill">ফিশিং</div>
+    <div class="pill">পোকার</div>
+  </div>
+
+  <!-- categories -->
+  <div class="categories">
+    <div class="cat"><div class="icon">🔥</div><div>ক্র্যাশ</div></div>
+   <a href="Dice/7up7down.html"> <div class="cat"><div class="icon">🎲</div><div>ডাইস</div></div></a>
+    <div class="cat"><div class="icon">🎰</div><div>স্লট</div></div>
+    <div class="cat"><div class="icon">🪙</div><div>কয়েন</div></div>
+    <div class="cat"><div class="icon">🏏</div><div>স্পোর্টস</div></div>
+  </div>
+
+  <!-- hero -->
+  <div class="hero">🎉 আজকের স্পেশাল অফার</div>
+</div>
+
+  
+<footer class="site-footer">
+  <div class="container">
+    <div class="top-row">
+      <div class="copyright">
+        © <span id="footer-year"></span> <strong><a href="https://lazzaster.gamer.gd">Lazzaster</a></strong> — All Rights Reserved
+      </div>
+      <div class="rate">1ZST = <span id="usdt-rate">1USDT</span> USDT</div>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <h4>Support</h4>
+        <a href="/fairness">Fairness</a>
+        <a href="/support">Online Support</a>
+      </div>
+      <div class="col">
+        <h4>About Us</h4>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/aml">AML Policy</a>
+        <a href="/terms">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- index.html এর </footer> এর পরে যোগ করুন -->
+<script>
+// Authentication functions
+const API_BASE_URL = 'https://lazzaster.gamer.gd'; // আপনার ডোমেইন দিয়ে replace করুন
+
+async function registerUser(username, email, password, referral = '') {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/register.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password, referral })
+        });
+        return await response.json();
+    } catch (error) {
+        return { success: false, message: 'Network error. Please try again.' };
+    }
+}
+
+async function loginUser(username, password) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/login.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        return await response.json();
+    } catch (error) {
+        return { success: false, message: 'Network error. Please try again.' };
+    }
+}
+
+// Save auth token to localStorage
+function saveAuthData(token, userData) {
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('userData', JSON.stringify(userData));
+    // UI update
+    updateUIAfterLogin(userData);
+}
+
+// Check if user is logged in
+function isLoggedIn() {
+    return localStorage.getItem('authToken') !== null;
+}
+
+// Get user data
+function getUserData() {
+    const userData = localStorage.getItem('userData');
+    return userData ? JSON.parse(userData) : null;
+}
+
+// Logout function
+function logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    window.location.reload();
+}
+
+// UI update after login
+function updateUIAfterLogin(userData) {
+    const topActions = document.querySelector('.top-actions');
+    if (topActions && userData) {
+        topActions.innerHTML = `
+            <button class="top-btn">${userData.balance} ZST</button>
+            <button class="top-btn" onclick="logout()">লগআউট</button>
+        `;
+    }
+}
+
+// Check auth status on page load
+function checkAuthStatus() {
+    if (isLoggedIn()) {
+        const userData = getUserData();
+        updateUIAfterLogin(userData);
+    }
+}
+
+// Page load event
+document.addEventListener('DOMContentLoaded', function() {
+    checkAuthStatus();
+});
+
+// Login modal function (যদি মোডাল ব্যবহার করতে চান)
+function showLoginModal() {
+    // আপনার লগইন মোডাল show করার কোড
+    window.location.href = 'login.html'; // অথবা直接 লগইন পেজে redirect
+}
+</script>
+<script>
+(function(){
+  document.getElementById("footer-year").textContent = new Date().getFullYear();
+  document.getElementById("usdt-rate").textContent = (1).toLocaleString();
+})();
+</script>
+<!-- ===================== Clean Footer END =================
+
+<!-- floating chat -->
+<div class="float-chat">💬</div>
+
+<!-- bottom nav -->
+<nav class="bottom-nav">
+  <div class="b-item"><div class="b-icon">🏠</div><div>হোম</div></div>
+  <div class="b-item"><div class="b-icon">🎁</div><div>প্রোমো</div></div>
+  <div class="b-item"><div class="b-icon">➕</div><div>খেলা</div></div>
+  <div class="b-item"><div class="b-icon">🏆</div><div>পুরস্কার</div></div>
+  <div class="b-item"><div class="b-icon">👤</div><div>অ্যাকাউন্ট</div></div>
+</nav>
+
+<script>
+/* Simple PWA manifest + service worker */
+(function(){
+  const manifest = {
+    name:"Lazzaster",
+    short_name:"Lazzaster",
+    start_url:"/",
+    display:"standalone",
+    background_color:"#fde9b8",
+    theme_color:"#0f5a3f",
+    icons:[{src:"icon.png",sizes:"192x192",type:"image/png"}]
+  };
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('link');
+  link.rel='manifest';link.href=url;document.head.appendChild(link);
+
+  if('serviceWorker' in navigator){
+    const sw="self.addEventListener('fetch',()=>{});";
+    const swBlob=new Blob([sw],{type:'application/javascript'});
+    const swUrl=URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl);
+  }
+})();
+</script>
+</body>
+</html>
