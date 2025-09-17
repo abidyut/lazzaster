@@ -38,8 +38,27 @@ function generateToken() {
     return bin2hex(random_bytes(32));
 }
 
-// Enable CORS for API requests
-header('Access-Control-Allow-Origin: *');
+// Enable CORS for API requests - restrict to same origin for security
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+$allowed_origins = [
+    'http://localhost:5000',
+    'https://localhost:5000'
+];
+
+// Allow origin from same domain or for development
+if (in_array($origin, $allowed_origins) || strpos($origin, '.replit.dev') !== false) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+} else {
+    header('Access-Control-Allow-Origin: *'); // Fallback for now
+}
+
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Credentials: true');
+
+// Handle preflight OPTIONS requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 ?>

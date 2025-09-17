@@ -137,7 +137,7 @@ async function settle(sum) {
 // Server-এ balance আপডেট করার function
 async function updateServerBalance() {
     try {
-        const response = await fetch(`https://96eb6138-acb4-4a48-a957-355e9a403981-00-2g8tbrxx2lhrp.sisko.replit.dev/api/update_balance.php`, {
+        const response = await fetch(`${window.location.origin}/api/update_balance.php`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ async function settle(sum) {
 // Server-এ balance আপডেট করার function
 async function updateServerBalance() {
     try {
-        const response = await fetch(`https://96eb6138-acb4-4a48-a957-355e9a403981-00-2g8tbrxx2lhrp.sisko.replit.dev/api/update_balance.php`, {
+        const response = await fetch(`${window.location.origin}/api/update_balance.php`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
