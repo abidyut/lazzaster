@@ -70,27 +70,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Create deposits table if it doesn't exist
-        $createTableSQL = "
-            CREATE TABLE IF NOT EXISTS deposits (
-                id SERIAL PRIMARY KEY,
-                user_id INTEGER NOT NULL,
-                username VARCHAR(50) NOT NULL,
-                method VARCHAR(20) NOT NULL,
-                transaction_id VARCHAR(100) NOT NULL UNIQUE,
-                zst_amount DECIMAL(10,2) NOT NULL,
-                bdt_amount DECIMAL(10,2) DEFAULT 0,
-                usd_amount DECIMAL(10,2) DEFAULT 0,
-                status VARCHAR(20) DEFAULT 'pending',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                processed_at TIMESTAMP NULL
-            )";
-        $db->exec($createTableSQL);
-        
-        // Insert deposit record
+        // Insert deposit record and get the ID
         $stmt = $db->prepare("
             INSERT INTO deposits (user_id, username, method, transaction_id, zst_amount, bdt_amount, usd_amount, status) 
             VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
+            RETURNING id
         ");
         $stmt->execute([
             $userId, 
@@ -102,7 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $usdAmount
         ]);
         
-        $depositId = $db->lastInsertId();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $depositId = $result['id'];
         
         echo json_encode([
             'success' => true, 
