@@ -1,14 +1,15 @@
 <?php
-// Database configuration - Replace with your Infinity Free details
-define('DB_HOST', 'sql100.infinityfree.com'); // Your Infinity Free MySQL host
-define('DB_NAME', 'if0_39588465_user_auth'); // Your database name
-define('DB_USER', 'if0_39588465'); // Your database username
-define('DB_PASS', '37aL37aL'); // Your database password
+// Database configuration - Using Replit PostgreSQL
+$db_url = getenv('DATABASE_URL');
+if (!$db_url) {
+    die("Database URL not found in environment variables");
+}
 
 // Create connection
 function getDB() {
     try {
-        $pdo = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME, DB_USER, DB_PASS);
+        $db_url = getenv('DATABASE_URL');
+        $pdo = new PDO($db_url);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     } catch(PDOException $e) {
