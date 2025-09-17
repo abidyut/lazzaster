@@ -90,140 +90,83 @@
     <div class="rate">Tx <span id="tx">300000</span></div>
   </div>
 </div>
+<script src="../js/auth.js"></script>
 <script>
-// Authentication check
-const authToken = localStorage.getItem('authToken');
-const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+// Authentication check and initialization
+authManager.requireAuth();
 
-if (!authToken) {
-    alert('দয়া করে প্রথমে লগইন করুন');
-    window.location.href = '../login.html';
-    throw new Error('User not authenticated');
+// Initialize balance from server
+let balance = 0;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Game initialization started - loading balance from server...');
+    
+    // Get fresh balance from server - required for gameplay
+    const serverBalance = await authManager.getBalance();
+    if (serverBalance !== null) {
+        balance = parseFloat(serverBalance);
+        updateBalanceUI();
+        console.log('Balance loaded successfully:', balance);
+        
+        // Initialize game after balance is loaded
+        if (typeof init === 'function') {
+            init();
+            console.log('Game initialized successfully');
+        } else {
+            console.error('init function not found - script.js may not be loaded');
+        }
+        
+        // Add runtime check to monitor for deprecated endpoint calls
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            const url = typeof args[0] === 'string' ? args[0] : (args[0] && args[0].url ? args[0].url : '');
+            if (String(url).includes('update_balance.php')) {
+                console.error('CRITICAL: Deprecated endpoint called!', url);
+                alert('Error: Deprecated API endpoint called. This should not happen.');
+            }
+            return originalFetch.apply(window, args);
+        };
+    } else {
+        // Block gameplay until server balance is available
+        document.getElementById('msg').textContent = 'Unable to load balance. Please refresh the page.';
+        document.querySelectorAll('.cell, .gcell, #chips .c, #again, #dbl, #clr').forEach(el => {
+            el.style.pointerEvents = 'none';
+            el.style.opacity = '0.5';
+        });
+        console.error('Failed to load balance from server. Gameplay disabled.');
+    }
+});
+
+// Update balance in UI
+function updateBalanceUI() {
+    const balanceElement = document.getElementById('balance');
+    if (balanceElement && typeof fmt === 'function') {
+        balanceElement.textContent = fmt(balance);
+    }
 }
 
-// ব্যালেন্স userData থেকে লোড করুন
-let balance = userData.balance ? parseFloat(userData.balance) : 200.00;
+// Game settlement function - apply delta to balance
+async function applyGameSettlement(deltaAmount, reason = 'dice_game') {
+    try {
+        const newBalance = await authManager.applyBalanceDelta(deltaAmount, reason);
+        if (newBalance !== null) {
+            balance = parseFloat(newBalance);
+            updateBalanceUI();
+            return parseFloat(newBalance); // Return the actual balance
+        } else {
+            console.error('Failed to apply game settlement');
+            return null; // Return null to indicate failure
+        }
+    } catch (error) {
+        console.error('Game settlement error:', error);
+        return null; // Return null to indicate failure
+    }
+}
 
 // Logout function for game page
 function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    window.location.href = '../index.html';
-}
-
-// Update balance in UI
-function refreshUI() {
-    // আপনার existing refreshUI function
-    $("#balance").textContent = fmt(balance);
-    
-    // User balance also update করুন যদি UI-তে থাকে
-    const userBalanceElement = document.querySelector('.user-balance');
-    if (userBalanceElement) {
-        userBalanceElement.textContent = fmt(balance);
-    }
-}
-
-// Game settlement এর পরে balance আপডেট করুন
-async function settle(sum) {
-    // আপনার existing settle function
-    
-    // Balance আপডেট করার পর
-    if (isLoggedIn()) {
-        // Server-এ balance আপডেট করার API call করুন
-        await updateServerBalance();
-    }
-}
-
-// Server-এ balance আপডেট করার function
-async function updateServerBalance() {
-    try {
-        const response = await fetch(`${window.location.origin}/api/update_balance.php`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-            },
-            body: JSON.stringify({
-                balance: balance,
-                user_id: getUserData().id
-            })
-        });
-        
-        const result = await response.json();
-        if (!result.success) {
-            console.error('Balance update failed:', result.message);
-        }
-    } catch (error) {
-        console.error('Balance update error:', error);
-    }
-}
-</script><!-- গেম পেজের script.js এর সবচেয়ে উপরে -->
-<script>
-// Authentication check
-const authToken = localStorage.getItem('authToken');
-const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-
-if (!authToken) {
-    alert('দয়া করে প্রথমে লগইন করুন');
-    window.location.href = '../login.html';
-    throw new Error('User not authenticated');
-}
-
-// ব্যালেন্স userData থেকে লোড করুন
-let balance = userData.balance ? parseFloat(userData.balance) : 200.00;
-
-// Logout function for game page
-function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    window.location.href = '../index.html';
-}
-
-// Update balance in UI
-function refreshUI() {
-    // আপনার existing refreshUI function
-    $("#balance").textContent = fmt(balance);
-    
-    // User balance also update করুন যদি UI-তে থাকে
-    const userBalanceElement = document.querySelector('.user-balance');
-    if (userBalanceElement) {
-        userBalanceElement.textContent = fmt(balance);
-    }
-}
-
-// Game settlement এর পরে balance আপডেট করুন
-async function settle(sum) {
-    // আপনার existing settle function
-    
-    // Balance আপডেট করার পর
-    if (isLoggedIn()) {
-        // Server-এ balance আপডেট করার API call করুন
-        await updateServerBalance();
-    }
-}
-
-// Server-এ balance আপডেট করার function
-async function updateServerBalance() {
-    try {
-        const response = await fetch(`${window.location.origin}/api/update_balance.php`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('authToken')
-            },
-            body: JSON.stringify({
-                balance: balance,
-                user_id: getUserData().id
-            })
-        });
-        
-        const result = await response.json();
-        if (!result.success) {
-            console.error('Balance update failed:', result.message);
-        }
-    } catch (error) {
-        console.error('Balance update error:', error);
-    }
+    authManager.logout();
 }
 </script>
 <script src="./js/script.js"></script>

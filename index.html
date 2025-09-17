@@ -19,7 +19,7 @@
     <div class="logo-text">Lazzaster</div>
     <div class="top-actions">
       <button class="top-btn"><a href="signup.html">একাউন্টখুলুন</a></button>
-      <button class="top-btn">লগইন</button>
+      <button class="top-btn" onclick="window.location.href='login.html'">লগইন</button>
     </div>
   </header>
 
@@ -88,6 +88,7 @@
   </div>
 </footer>
 <!-- index.html এর </footer> এর পরে যোগ করুন -->
+<script src="js/auth.js"></script>
 <script>
 // Authentication functions
 const API_BASE_URL = window.location.origin; // Use current domain for API calls
@@ -126,22 +127,9 @@ function saveAuthData(token, userData) {
     updateUIAfterLogin(userData);
 }
 
-// Check if user is logged in
-function isLoggedIn() {
-    return localStorage.getItem('authToken') !== null;
-}
-
-// Get user data
-function getUserData() {
-    const userData = localStorage.getItem('userData');
-    return userData ? JSON.parse(userData) : null;
-}
-
 // Logout function
 function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    window.location.reload();
+    authManager.logout();
 }
 
 // UI update after login
@@ -157,8 +145,8 @@ function updateUIAfterLogin(userData) {
 
 // Check auth status on page load
 function checkAuthStatus() {
-    if (isLoggedIn()) {
-        const userData = getUserData();
+    if (authManager.isLoggedIn()) {
+        const userData = authManager.getUserData();
         updateUIAfterLogin(userData);
     }
 }

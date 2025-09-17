@@ -5,15 +5,15 @@ const BET_TIME=15, PREROLL_MIN=2, PREROLL_MAX=3;
 const MIN_BET=0.10, MULT_MIN=2, MULT_MAX=300;
 let multCooldown = 0;
 
-let balance = parseFloat(localStorage.getItem('zst_balance') ?? '200.00');
+// Balance is managed by auth module and game page initialization
 let betState = { range:{down:0,seven:0,up:0}, sum:Object.fromEntries(Array.from({length:11},(_,i)=>[i+2,0])) };
-let lastBet=null, timer=BET_TIME, tId=null, rolling=false, tx=300000+Math.floor(Math.random()*10000), multipliers={}, phase='bet', roundNum=0;
+let lastBet=null, timer=BET_TIME, tId=null, rolling=false, tx=300000+Math.floor(Math.random()*10000), multipliers={}, phase='bet', roundNum=0, balanceReady=false;
 
 /* helpers */
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
 const fmt = n => (Math.round(n*100)/100).toFixed(2) + ' ZST';
 function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function saveBalance(){ localStorage.setItem('zst_balance', balance.toFixed(2)); }
+// Balance persistence handled by server API - removed localStorage save
 
 /* audio simple */
 const audioCtx = (()=>{ try{return new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null} })();
@@ -106,6 +106,7 @@ $("#chips").addEventListener("click", e=>{
 });
 document.addEventListener("click", e=>{
   const cell = e.target.closest(".cell,.gcell"); if(!cell) return;
+  if(!balanceReady){ $("#msg").textContent="Loading balance..."; return; }
   if(rolling || phase!=='bet') return;
   if(chip < MIN_BET){ $("#msg").textContent="Chip below min (0.10 ZST)"; sfx('lose'); return; }
   if(balance < chip){ $("#msg").textContent="Insufficient balance"; sfx('lose'); return; }
@@ -117,20 +118,20 @@ document.addEventListener("click", e=>{
   } else {
     const k = +cell.dataset.key; balance -= chip; betState.sum[k]+=chip; lastBet={type:"sum",key:k,amt:chip};
   }
-  sfx('click'); saveBalance(); refreshUI();
+  sfx('click'); refreshUI();
 });
 
 /* controls */
-$("#again").onclick = ()=>{ if(!lastBet){ $("#msg").textContent="No last bet"; return; } if(rolling || phase!=='bet') return;
+$("#again").onclick = ()=>{ if(!balanceReady){ $("#msg").textContent="Loading balance..."; return; } if(!lastBet){ $("#msg").textContent="No last bet"; return; } if(rolling || phase!=='bet') return;
   const lb = lastBet; if(balance < lb.amt){ $("#msg").textContent="Insufficient balance"; sfx('lose'); return; } balance -= lb.amt;
-  if(lb.type==="range") betState.range[lb.key]+=lb.amt; else betState.sum[lb.key]+=lb.amt; sfx('click'); saveBalance(); refreshUI();
+  if(lb.type==="range") betState.range[lb.key]+=lb.amt; else betState.sum[lb.key]+=lb.amt; sfx('click'); refreshUI();
 };
-$("#dbl").onclick = ()=>{ if(rolling || phase!=='bet') return; const spent = Object.values(betState.range).reduce((a,b)=>a+b,0)+Object.values(betState.sum).reduce((a,b)=>a+b,0);
+$("#dbl").onclick = ()=>{ if(!balanceReady){ $("#msg").textContent="Loading balance..."; return; } if(rolling || phase!=='bet') return; const spent = Object.values(betState.range).reduce((a,b)=>a+b,0)+Object.values(betState.sum).reduce((a,b)=>a+b,0);
   if(spent<=0){ $("#msg").textContent="Place a bet first"; return; } if(balance<spent){ $("#msg").textContent="Insufficient balance"; sfx('lose'); return; }
-  balance -= spent; for(const k in betState.range) betState.range[k]*=2; for(const k in betState.sum) betState.sum[k]*=2; sfx('click'); saveBalance(); refreshUI();
+  balance -= spent; for(const k in betState.range) betState.range[k]*=2; for(const k in betState.sum) betState.sum[k]*=2; sfx('click'); refreshUI();
 };
-$("#clr").onclick = ()=>{ if(rolling || phase!=='bet') return; const refund = Object.values(betState.range).reduce((a,b)=>a+b,0)+Object.values(betState.sum).reduce((a,b)=>a+b,0);
-  balance += refund; betState={ range:{down:0,seven:0,up:0}, sum:Object.fromEntries(Array.from({length:11},(_,i)=>[i+2,0])) }; lastBet=null; sfx('click'); saveBalance(); refreshUI();
+$("#clr").onclick = ()=>{ if(!balanceReady){ $("#msg").textContent="Loading balance..."; return; } if(rolling || phase!=='bet') return; const refund = Object.values(betState.range).reduce((a,b)=>a+b,0)+Object.values(betState.sum).reduce((a,b)=>a+b,0);
+  balance += refund; betState={ range:{down:0,seven:0,up:0}, sum:Object.fromEntries(Array.from({length:11},(_,i)=>[i+2,0])) }; lastBet=null; sfx('click'); refreshUI();
 };
 
 /* timer + round flow */
@@ -228,7 +229,7 @@ function maybeActivateMultipliers(){
 }
 
 /* settle */
-function settle(sum){
+async function settle(sum){
   $("#sumBoard").textContent = `Result: ${sum}`;
   pushHist(sum);
   const totalBet = Object.values(betState.range).reduce((a,b)=>a+b,0) + Object.values(betState.sum).reduce((a,b)=>a+b,0);
@@ -237,12 +238,30 @@ function settle(sum){
   if(sum===7 && betState.range.seven>0){ const base = PAY_RANGE.seven+1; const m = multipliers.seven||1; win += betState.range.seven * base * m; }
   if(sum>7 && betState.range.up>0){ const base = PAY_RANGE.up+1; const m = multipliers.up||1; win += betState.range.up * base * m; }
   for(let s=2;s<=12;s++){ if(betState.sum[s]>0 && s===sum){ const base=PAY_SUM[s]+1; const m = multipliers[String(s)]||1; win += betState.sum[s] * base * m; } }
-  balance += win;
+  
   // compute net result for the player (positive = net win, negative = net loss)
   const net = Math.round((win - totalBet) * 100) / 100;
   updateLastResultDisplay(net);
-  if(win>0){ $("#msg").textContent = `You won: ${fmt(win)} | New balance ${fmt(balance)}`; sfx('win'); coinRain(); } else { $("#msg").textContent = `You lost: ${fmt(totalBet)} | New balance ${fmt(balance)}`; sfx('lose'); }
-  $("#tx").textContent = String(++tx); saveBalance();
+  
+  // Apply balance change to server
+  try {
+    const newBalance = await applyGameSettlement(net, 'dice_game');
+    if (newBalance !== null) {
+      balance = newBalance;
+      if(win>0){ $("#msg").textContent = `You won: ${fmt(win)} | New balance ${fmt(balance)}`; sfx('win'); coinRain(); } else { $("#msg").textContent = `You lost: ${fmt(totalBet)} | New balance ${fmt(balance)}`; sfx('lose'); }
+    } else {
+      $("#msg").textContent = "Settlement failed. Please refresh and try again.";
+      sfx('lose');
+      return; // Don't proceed with game reset if settlement failed
+    }
+  } catch (error) {
+    console.error('Settlement error:', error);
+    $("#msg").textContent = "Network error during settlement. Please refresh.";
+    sfx('lose');
+    return; // Don't proceed with game reset if settlement failed
+  }
+  
+  $("#tx").textContent = String(++tx);
   betState = { range:{down:0,seven:0,up:0}, sum:Object.fromEntries(Array.from({length:11},(_,i)=>[i+2,0])) };
   lastBet=null; refreshUI(); rolling=false; hideMultipliers(); startBet();
 }
@@ -283,6 +302,7 @@ function init(){
   buildDie($("#d1")); buildDie($("#d2"));
   // initial orientation to show distinct faces
   $("#d1").style.transform = ori[3]; $("#d2").style.transform = ori[4];
+  balanceReady = true; // Enable betting after initialization
   refreshUI(); startBet();
   setInterval(()=>{ if(phase==='bet') avatarFlyToBet(); },1200);
   const avImgs = ["https://i.pravatar.cc/64?img=12","https://i.pravatar.cc/64?img=32","https://i.pravatar.cc/64?img=5","https://i.pravatar.cc/64?img=7"];
@@ -298,4 +318,4 @@ document.addEventListener('gesturechange', e=>e.preventDefault());
 document.addEventListener('gestureend', e=>e.preventDefault());
 
 /* start */
-init();
+// init() is now called from 7up7down.html after balance is loaded

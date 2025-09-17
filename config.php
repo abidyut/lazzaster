@@ -38,23 +38,22 @@ function generateToken() {
     return bin2hex(random_bytes(32));
 }
 
-// Enable CORS for API requests - restrict to same origin for security
+// Enable CORS for API requests - secure configuration
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 $allowed_origins = [
     'http://localhost:5000',
     'https://localhost:5000'
 ];
 
-// Allow origin from same domain or for development
+// Allow origin from same domain or for development (.replit.dev domains)
 if (in_array($origin, $allowed_origins) || strpos($origin, '.replit.dev') !== false) {
     header('Access-Control-Allow-Origin: ' . $origin);
-} else {
-    header('Access-Control-Allow-Origin: *'); // Fallback for now
+    header('Access-Control-Allow-Credentials: true');
 }
 
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Access-Control-Allow-Credentials: true');
+header('Vary: Origin');
 
 // Handle preflight OPTIONS requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
