@@ -1,31 +1,42 @@
 <?php
-// Database configuration - Using Replit PostgreSQL
-$db_url = getenv('DATABASE_URL');
-if (!$db_url) {
-    die("Database URL not found in environment variables");
-}
+// Database configuration - Using MySQL for InfinityFree hosting
+// Update these with your InfinityFree database credentials from control panel
+
+// MySQL Database Configuration
+// For InfinityFree, typically format is:
+// Host: sql###.epizy.com (from your control panel)
+// Database: epiz_########_dbname
+// Username: epiz_########_username
+// Password: your_password_from_control_panel
+
+$db_host = 'localhost';  // Change to your InfinityFree MySQL host (e.g., sql###.epizy.com)
+$db_port = '3306';
+$db_name = 'lazzaster_gaming';  // Change to your InfinityFree database name (e.g., epiz_########_lazzaster)
+$db_user = 'root';              // Change to your InfinityFree username (e.g., epiz_########_user)
+$db_pass = '';                  // Change to your InfinityFree database password
 
 // Create connection
 function getDB() {
+    global $db_host, $db_port, $db_name, $db_user, $db_pass;
+    
     try {
-        $db_url = getenv('DATABASE_URL');
+        // Build MySQL DSN for PDO with proper options for PHP 8.3
+        $dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4";
         
-        // Parse the URL components
-        $url_parts = parse_url($db_url);
-        $host = $url_parts['host'];
-        $port = $url_parts['port'] ?? 5432;
-        $dbname = ltrim($url_parts['path'], '/');
-        $user = $url_parts['user'];
-        $password = $url_parts['pass'];
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
+        ];
         
-        // Build PostgreSQL DSN for PDO
-        $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
-        
-        $pdo = new PDO($dsn, $user, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo = new PDO($dsn, $db_user, $db_pass, $options);
         return $pdo;
+        
     } catch(PDOException $e) {
-        die("Connection failed: " . $e->getMessage());
+        // Log error details securely (don't expose to user)
+        error_log("Database connection failed: " . $e->getMessage());
+        die("Database connection error. Please contact administrator.");
     }
 }
 
@@ -75,7 +86,7 @@ function validateSecureToken($db, $token, $tokenType = 'auth') {
         LEFT JOIN admin_roles ar ON u.role_id = ar.id
         WHERE st.token_hash = ? 
         AND st.token_type = ? 
-        AND st.is_revoked = FALSE 
+        AND st.is_revoked = 0 
         AND st.expires_at > NOW()
     ");
     
@@ -88,7 +99,7 @@ function revokeToken($db, $token, $revokedBy = null) {
     
     $stmt = $db->prepare("
         UPDATE secure_tokens 
-        SET is_revoked = TRUE, revoked_at = NOW(), revoked_by = ? 
+        SET is_revoked = 1, revoked_at = NOW(), revoked_by = ? 
         WHERE token_hash = ?
     ");
     
@@ -98,15 +109,15 @@ function revokeToken($db, $token, $revokedBy = null) {
 function revokeAllUserTokens($db, $userId, $revokedBy = null) {
     $stmt = $db->prepare("
         UPDATE secure_tokens 
-        SET is_revoked = TRUE, revoked_at = NOW(), revoked_by = ? 
-        WHERE user_id = ? AND is_revoked = FALSE
+        SET is_revoked = 1, revoked_at = NOW(), revoked_by = ? 
+        WHERE user_id = ? AND is_revoked = 0
     ");
     
     return $stmt->execute([$revokedBy, $userId]);
 }
 
 function cleanupExpiredTokens($db) {
-    $stmt = $db->prepare("DELETE FROM secure_tokens WHERE expires_at < NOW() OR created_at < NOW() - INTERVAL '30 days'");
+    $stmt = $db->prepare("DELETE FROM secure_tokens WHERE expires_at < NOW() OR created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
     return $stmt->execute();
 }
 
@@ -146,15 +157,19 @@ function logAdminAction($db, $adminId, $action, $details = null, $targetUserId =
     return $stmt->execute([$adminId, $action, $targetUserId, $detailsJson, $ipAddress]);
 }
 
-// Enable CORS for API requests - secure configuration
+// Enable CORS for API requests - configuration for InfinityFree and local development
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 $allowed_origins = [
     'http://localhost:5000',
     'https://localhost:5000'
 ];
 
-// Allow origin from same domain or for development (.replit.dev domains)
-if (in_array($origin, $allowed_origins) || strpos($origin, '.replit.dev') !== false) {
+// For same-domain requests (typical for InfinityFree), no CORS headers needed
+// Allow origin from allowed list or development domains (.replit.dev, .epizy.com, .infinityfreeapp.com)
+if (in_array($origin, $allowed_origins) || 
+    strpos($origin, '.replit.dev') !== false ||
+    strpos($origin, '.epizy.com') !== false ||
+    strpos($origin, '.infinityfreeapp.com') !== false) {
     header('Access-Control-Allow-Origin: ' . $origin);
     header('Access-Control-Allow-Credentials: true');
 }
