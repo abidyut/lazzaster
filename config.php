@@ -2,35 +2,51 @@
 // Database configuration - Using MySQL for InfinityFree hosting
 // Update these with your InfinityFree database credentials from control panel
 
-// SQLite Database Configuration for Development
-// Using SQLite for easier setup and development
+// Database Configuration (Development with SQLite, Production with MySQL)
+// For production, change to MySQL credentials
 
-$db_file = 'database/lazzaster_gaming.db';  // SQLite database file path
+$use_mysql = false; // Set to true for MySQL production
+
+// MySQL Configuration (for production)
+$db_host = 'localhost';
+$db_port = '3306';
+$db_name = 'lazzaster_gaming';
+$db_user = 'root';
+$db_pass = '';
+
+// SQLite Configuration (for development)
+$db_file = __DIR__ . '/database/lazzaster_gaming.db';
 
 // Create connection
 function getDB() {
-    global $db_file;
+    global $use_mysql, $db_host, $db_port, $db_name, $db_user, $db_pass, $db_file;
     
     try {
-        // Build SQLite DSN for PDO
-        $dsn = "sqlite:" . $db_file;
-        
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false
-        ];
-        
-        $pdo = new PDO($dsn, null, null, $options);
-        
-        // Enable foreign keys for SQLite
-        $pdo->exec("PRAGMA foreign_keys = ON;");
-        $pdo->exec("PRAGMA journal_mode = WAL;");
+        if ($use_mysql) {
+            // MySQL Connection
+            $dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4";
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
+            ];
+            $pdo = new PDO($dsn, $db_user, $db_pass, $options);
+        } else {
+            // SQLite Connection
+            $dsn = "sqlite:" . $db_file;
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false
+            ];
+            $pdo = new PDO($dsn, null, null, $options);
+            $pdo->exec("PRAGMA foreign_keys = ON;");
+        }
         
         return $pdo;
         
     } catch(PDOException $e) {
-        // Log error details securely (don't expose to user)
         error_log("Database connection failed: " . $e->getMessage());
         die("Database connection error. Please contact administrator.");
     }
@@ -83,7 +99,7 @@ function validateSecureToken($db, $token, $tokenType = 'auth') {
         WHERE st.token_hash = ? 
         AND st.token_type = ? 
         AND st.is_revoked = 0 
-        AND st.expires_at > NOW()
+        AND st.expires_at > CURRENT_TIMESTAMP
     ");
     
     $stmt->execute([$tokenHash, $tokenType]);
@@ -95,7 +111,7 @@ function revokeToken($db, $token, $revokedBy = null) {
     
     $stmt = $db->prepare("
         UPDATE secure_tokens 
-        SET is_revoked = 1, revoked_at = NOW(), revoked_by = ? 
+        SET is_revoked = 1, revoked_at = CURRENT_TIMESTAMP, revoked_by = ? 
         WHERE token_hash = ?
     ");
     
@@ -105,7 +121,7 @@ function revokeToken($db, $token, $revokedBy = null) {
 function revokeAllUserTokens($db, $userId, $revokedBy = null) {
     $stmt = $db->prepare("
         UPDATE secure_tokens 
-        SET is_revoked = 1, revoked_at = NOW(), revoked_by = ? 
+        SET is_revoked = 1, revoked_at = CURRENT_TIMESTAMP, revoked_by = ? 
         WHERE user_id = ? AND is_revoked = 0
     ");
     
@@ -113,7 +129,7 @@ function revokeAllUserTokens($db, $userId, $revokedBy = null) {
 }
 
 function cleanupExpiredTokens($db) {
-    $stmt = $db->prepare("DELETE FROM secure_tokens WHERE expires_at < NOW() OR created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $stmt = $db->prepare("DELETE FROM secure_tokens WHERE expires_at < CURRENT_TIMESTAMP OR created_at < datetime('now', '-30 days')");
     return $stmt->execute();
 }
 

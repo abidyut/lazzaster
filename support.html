@@ -612,7 +612,7 @@
                         ZST কি? এর মূল্য কত? <span>+</span>
                     </div>
                     <div class="faq-answer">
-                        ZST হল Lazzaster এর অভ্যন্তরীণ মুদ্রা। বর্তমানে ১ ZST = ২০০ টাকা ≈ $০.৯০ USD।
+                        ZST হল Lazzaster এর অভ্যন্তরীণ মুদ্রা। বর্তমানে ১ ZST = ১০০ টাকা = $০.৯০ USD।
                     </div>
                 </div>
                 
@@ -678,11 +678,11 @@
                 <h4>স্বাগতম! 👋</h4>
                 <p>আমরা আপনাকে সাহায্য করতে এখানে আছি।</p>
                 <div class="chat-category">
-                    <button class="category-btn" onclick="selectCategory('general', this)">সাধারণ প্রশ্ন</button>
-                    <button class="category-btn" onclick="selectCategory('deposit', this)">ডিপোজিট</button>
-                    <button class="category-btn" onclick="selectCategory('withdrawal', this)">উইথড্র</button>
-                    <button class="category-btn" onclick="selectCategory('technical', this)">টেকনিক্যাল</button>
-                    <button class="category-btn" onclick="selectCategory('complaint', this)">অভিযোগ</button>
+                    <button class="category-btn" onclick="window.chatManager?.selectCategory('general', this)">সাধারণ প্রশ্ন</button>
+                    <button class="category-btn" onclick="window.chatManager?.selectCategory('deposit', this)">ডিপোজিট</button>
+                    <button class="category-btn" onclick="window.chatManager?.selectCategory('withdrawal', this)">উইথড্র</button>
+                    <button class="category-btn" onclick="window.chatManager?.selectCategory('technical', this)">টেকনিক্যাল</button>
+                    <button class="category-btn" onclick="window.chatManager?.selectCategory('complaint', this)">অভিযোগ</button>
                 </div>
                 <p style="font-size: 0.8rem; margin-top: 10px; color: #999;">একটি বিষয় নির্বাচন করুন বা সরাসরি মেসেজ লিখুন</p>
             </div>
@@ -698,7 +698,7 @@
         
         <div class="chat-input-area">
             <input type="text" class="chat-input" id="chatInput" placeholder="এখানে আপনার মেসেজ লিখুন..." maxlength="500">
-            <button class="chat-send" id="chatSend" onclick="sendMessage()" disabled>
+            <button class="chat-send" id="sendMessage" disabled>
                 <span>▶</span>
             </button>
         </div>
@@ -712,48 +712,16 @@
         <div class="b-item" onclick="window.location.href='profile.html'"><div class="b-icon">👤</div><div>অ্যাকাউন্ট</div></div>
     </nav>
 
+    <script src="js/chat.js"></script>
     <script>
-        let chatOpen = false;
-        let conversationId = null;
-        let currentCategory = 'general';
-        let sessionId = null;
-        let pollInterval = null;
-        
-        // Initialize chat system
+        // Initialize chat system with ChatManager
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById("footer-year").textContent = new Date().getFullYear();
             document.getElementById("usdt-rate").textContent = (1).toLocaleString();
             
-            // Generate or restore session ID
-            sessionId = localStorage.getItem('chat_session_id');
-            if (!sessionId) {
-                sessionId = 'chat_' + Date.now() + '_' + Math.random().toString(36).substring(7);
-                localStorage.setItem('chat_session_id', sessionId);
-            }
-            
-            // Restore conversation ID if exists
-            conversationId = localStorage.getItem('chat_conversation_id');
-            
-            // Set up chat input event listeners
-            const chatInput = document.getElementById('chatInput');
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-            
-            // Enable/disable send button based on input
-            chatInput.addEventListener('input', function() {
-                const sendBtn = document.getElementById('chatSend');
-                sendBtn.disabled = this.value.trim() === '';
-            });
-            
-            // Update chat status
-            try {
-                updateChatStatus();
-            } catch (error) {
-                console.log('Chat status update failed:', error);
+            // Initialize ChatManager since chatModal exists
+            if (document.getElementById('chatModal') && !window.chatManager) {
+                window.chatManager = new ChatManager();
             }
         });
         
@@ -777,28 +745,18 @@
         
         function toggleChat() {
             const chatModal = document.getElementById('chatModal');
-            chatOpen = !chatOpen;
+            if (!chatModal) return;
             
-            if (chatOpen) {
-                chatModal.style.display = 'flex';
-                document.getElementById('chatInput').focus();
-                
-                // Start conversation if not already started
-                if (!conversationId) {
-                    startConversation();
-                }
-                
-                // Start polling for new messages
-                if (!pollInterval) {
-                    pollInterval = setInterval(pollMessages, 3000);
+            if (chatModal.style.display === 'flex') {
+                chatModal.style.display = 'none';
+                if (window.chatManager) {
+                    window.chatManager.closeChat();
                 }
             } else {
-                chatModal.style.display = 'none';
-                
-                // Stop polling when chat is closed
-                if (pollInterval) {
-                    clearInterval(pollInterval);
-                    pollInterval = null;
+                chatModal.style.display = 'flex';
+                document.getElementById('chatInput').focus();
+                if (!window.chatManager) {
+                    window.chatManager = new ChatManager();
                 }
             }
         }
@@ -807,226 +765,18 @@
             toggleChat();
         }
         
-        function selectCategory(category, element) {
-            currentCategory = category;
-            const categoryBtns = document.querySelectorAll('.category-btn');
-            categoryBtns.forEach(btn => {
-                btn.style.background = '#e9ecef';
-                btn.style.color = '#333';
-                btn.style.borderColor = '#ddd';
-            });
-            
-            element.style.background = 'var(--green)';
-            element.style.color = 'white';
-            element.style.borderColor = 'var(--green)';
-            
-            // Send automatic message based on category
-            const categoryMessages = {
-                'general': 'আমার সাধারণ প্রশ্ন আছে',
-                'deposit': 'ডিপোজিট সংক্রান্ত সমস্যা',
-                'withdrawal': 'উইথড্র সংক্রান্ত সমস্যা',
-                'technical': 'টেকনিক্যাল সমস্যা',
-                'complaint': 'অভিযোগ জানাতে চাই'
-            };
-            
-            addMessage(categoryMessages[category], 'user');
-            
-            // Hide welcome message
-            const welcome = document.querySelector('.chat-welcome');
-            if (welcome) welcome.style.display = 'none';
-            
-            // Send to backend
-            sendMessageToBackend(categoryMessages[category]);
-        }
-        
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const sendBtn = document.getElementById('chatSend');
-            const message = input.value.trim();
-            
-            if (message === '' || sendBtn.disabled) return;
-            
-            // Add user message to chat
-            addMessage(message, 'user');
-            input.value = '';
-            
-            // Disable send button temporarily
-            sendBtn.disabled = true;
-            
-            // Hide welcome message if visible
-            const welcome = document.querySelector('.chat-welcome');
-            if (welcome) welcome.style.display = 'none';
-            
-            // Send to backend
-            sendMessageToBackend(message);
-        }
-        
-        function addMessage(text, sender, timestamp = null) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${sender}`;
-            
-            const time = timestamp ? new Date(timestamp) : new Date();
-            const timeString = time.toLocaleTimeString('bn-BD', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
-            
-            const messageText = document.createElement('div');
-            messageText.textContent = text; // Safe text rendering, prevents XSS
-            
-            const messageTime = document.createElement('div');
-            messageTime.className = 'message-time';
-            messageTime.textContent = timeString;
-            
-            messageContent.appendChild(messageText);
-            messageContent.appendChild(messageTime);
-            messageDiv.appendChild(messageContent);
-            
-            // Insert before typing indicator
-            const typingIndicator = document.getElementById('typingIndicator');
-            messagesContainer.insertBefore(messageDiv, typingIndicator);
-            
-            // Scroll to bottom smoothly
-            setTimeout(() => {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }, 10);
-            
-            return messageDiv;
-        }
-        
-        function showTypingIndicator() {
-            document.getElementById('typingIndicator').style.display = 'block';
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-        
-        function hideTypingIndicator() {
-            document.getElementById('typingIndicator').style.display = 'none';
-        }
-        
-        function startConversation() {
-            // This will be connected to backend API later
-            fetch('/api/chat.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'start_conversation',
-                    session_id: sessionId,
-                    category: currentCategory
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    conversationId = data.conversation_id;
-                    localStorage.setItem('chat_conversation_id', conversationId);
-                }
-            })
-            .catch(error => {
-                console.log('Backend not ready yet, using demo mode');
-                conversationId = 'demo_' + Date.now();
-                localStorage.setItem('chat_conversation_id', conversationId);
-                
-                // Add welcome message from admin
-                setTimeout(() => {
-                    addMessage('নমস্কার! আমি আপনাকে সাহায্য করতে এখানে আছি। আপনার সমস্যা বলুন।', 'admin');
-                }, 1000);
-            });
-        }
-        
-        function sendMessageToBackend(message) {
-            showTypingIndicator();
-            
-            // Show send button as disabled
-            const sendBtn = document.getElementById('chatSend');
-            sendBtn.disabled = true;
-            
-            // This will be connected to backend API later
-            fetch('/api/chat.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'send_message',
-                    conversation_id: conversationId,
-                    message: message,
-                    category: currentCategory
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideTypingIndicator();
-                sendBtn.disabled = false;
-                
-                if (data.success && data.response) {
-                    setTimeout(() => {
-                        addMessage(data.response, 'admin');
-                    }, 500);
-                }
-            })
-            .catch(error => {
-                hideTypingIndicator();
-                sendBtn.disabled = false;
-                
-                // Demo auto-responses while backend is not ready
-                setTimeout(() => {
-                    const demoResponses = [
-                        'ধন্যবাদ আপনার মেসেজের জন্য। আমি শীঘ্রই উত্তর দেব।',
-                        'আমি আপনার প্রশ্নটি দেখছি। একটু সময় দিন।',
-                        'আপনার সমস্যার সমাধানের জন্য আমি কাজ করছি।'
-                    ];
-                    const randomResponse = demoResponses[Math.floor(Math.random() * demoResponses.length)];
-                    addMessage(randomResponse, 'admin');
-                }, 1500);
-            });
-        }
-        
-        function pollMessages() {
-            if (!conversationId || !chatOpen) return;
-            
-            fetch(`/api/chat.php?action=get_messages&conversation_id=${conversationId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.messages) {
-                    // Add new messages that haven't been displayed yet
-                    data.messages.forEach(msg => {
-                        if (!document.querySelector(`[data-message-id="${msg.id}"]`)) {
-                            const messageDiv = addMessage(msg.message, msg.sender_type === 'admin' ? 'admin' : 'user', msg.created_at);
-                            if (messageDiv) {
-                                messageDiv.setAttribute('data-message-id', msg.id);
-                            }
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                // Backend not ready, skip polling
-            });
-        }
-        
-        function updateChatStatus() {
-            // This could check if admin is online
-            const statusElement = document.getElementById('chatStatus');
-            const currentHour = new Date().getHours();
-            
-            if (currentHour >= 9 && currentHour <= 21) {
-                statusElement.textContent = 'অনলাইন';
-                statusElement.style.color = '#4ade80';
-            } else {
-                statusElement.textContent = 'অফলাইন - ইমেইল করুন';
-                statusElement.style.color = '#f87171';
-            }
-        }
-        
         function emergencySupport() {
-            window.location.href = 'mailto:emergency@lazzaster.gamer.gd?subject=জরুরি%20সাহায্য&body=অনুগ্রহ%20করে%20আপনার%20সমস্যা%20বর্ণনা%20করুন';
+            if (window.chatManager) {
+                window.chatManager.selectCategory('complaint', null);
+                startLiveChat();
+            } else {
+                startLiveChat();
+                setTimeout(() => {
+                    if (window.chatManager) {
+                        window.chatManager.selectCategory('complaint', null);
+                    }
+                }, 100);
+            }
         }
     </script>
 </body>

@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lazzaster - উইথড্র</title>
+    <style>
+        /* Bengali font */
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('./Kalpurush.ttf');
+            font-display: swap;
+        }
+        
+        :root {
+            --green: #0f5a3f;
+            --green-dark: #0c4b35;
+            --gold: #f7c94a;
+            --gold-dark: #d2a621;
+            --bg: #fde9b8;
+            --muted: #6b6b6b;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --info: #3498db;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kalpurush', 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: #1b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .topbar {
+            background: linear-gradient(180deg, var(--green), var(--green-dark));
+            color: #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #f0b800);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        .top-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .top-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 18px;
+            color: #fff;
+            font-weight: 700;
+            font-size: .85rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,.18);
+        }
+        
+        .balance-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .balance-small {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        /* Form Container */
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.1);
+            margin: 20px 0;
+        }
+        
+        .form-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* Form Group */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Method Selection */
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .method-card {
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .method-card:hover {
+            border-color: var(--green);
+            transform: translateY(-2px);
+        }
+        
+        .method-card.selected {
+            border-color: var(--green);
+            background: rgba(15, 90, 63, 0.05);
+        }
+        
+        .method-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .method-name {
+            font-weight: 600;
+            color: var(--green);
+        }
+        
+        .method-subtitle {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+        
+        /* Account Details */
+        .account-details {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .account-details.show {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Messages */
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .message.info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #99d1f0;
+        }
+        
+        /* History */
+        .history-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.1);
+            margin: 20px 0;
+        }
+        
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 15px;
+        }
+        
+        .history-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-info {
+            flex: 1;
+        }
+        
+        .history-amount {
+            font-weight: 700;
+            color: var(--green);
+        }
+        
+        .history-method {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin: 2px 0;
+        }
+        
+        .history-date {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Warning Box */
+        .warning-box {
+            background: linear-gradient(135deg, var(--warning), #e67e22);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .warning-box strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--muted);
+        }
+        
+        /* Bottom navigation */
+        .bottom-nav {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 6px;
+            width: min(420px, 96%);
+            background: linear-gradient(180deg, #fff6df, #fff0cc);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            border-radius: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.18);
+        }
+        
+        .b-item {
+            flex: 1;
+            text-align: center;
+            font-size: .8rem;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        
+        .b-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffd100, #e5b200);
+            display: grid;
+            place-items: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .method-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        body {
+            padding-bottom: 80px;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-badge" onclick="window.location.href='index.html'">LZ</div>
+        <div class="logo-text" onclick="window.location.href='index.html'">Lazzaster</div>
+        <div class="top-actions">
+            <a href="profile.html" class="top-btn">প্রোফাইল</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Balance Card -->
+            <div class="balance-card">
+                <div class="balance-label">বর্তমান ব্যালেন্স</div>
+                <div class="balance-amount" id="currentBalance">0.00 ZST</div>
+                <div class="balance-small">≈ <span id="balanceBDT">0.00</span> BDT | <span id="balanceUSD">$0.00</span></div>
+            </div>
+
+            <!-- Withdrawal Form -->
+            <div class="form-container">
+                <h2 class="form-title">💰 উইথড্র রিকুয়েস্ট</h2>
+                
+                <div class="warning-box">
+                    <strong>⚠️ গুরুত্বপূর্ণ সূচনা</strong>
+                    ন্যূনতম উইথড্র পরিমাণ ৫ ZST। উইথড্র রিকুয়েস্ট অ্যাডমিন অনুমোদনের পর ২৪ ঘন্টার মধ্যে প্রক্রিয়া হবে।
+                </div>
+
+                <form id="withdrawalForm">
+                    <!-- Amount Input -->
+                    <div class="form-group">
+                        <label class="form-label">উইথড্র পরিমাণ (ZST)</label>
+                        <input type="number" id="withdrawAmount" class="form-input" placeholder="৫.০০" min="5" step="0.01" required>
+                        <small style="color: var(--muted);">ন্যূনতম: ৫ ZST | সর্বোচ্চ: <span id="maxAmount">0.00</span> ZST</small>
+                    </div>
+
+                    <!-- Method Selection -->
+                    <div class="form-group">
+                        <label class="form-label">উইথড্র পদ্ধতি</label>
+                        <div class="method-grid">
+                            <div class="method-card" data-method="bank">
+                                <div class="method-icon">🏦</div>
+                                <div class="method-name">ব্যাংক</div>
+                                <div class="method-subtitle">ব্যাংক ট্রান্সফার</div>
+                            </div>
+                            <div class="method-card" data-method="mobile">
+                                <div class="method-icon">📱</div>
+                                <div class="method-name">মোবাইল</div>
+                                <div class="method-subtitle">bKash, Nagad</div>
+                            </div>
+                            <div class="method-card" data-method="crypto">
+                                <div class="method-icon">₿</div>
+                                <div class="method-name">ক্রিপ্টো</div>
+                                <div class="method-subtitle">Bitcoin, USDT</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank Account Details -->
+                    <div id="bankDetails" class="account-details">
+                        <div class="form-group">
+                            <label class="form-label">ব্যাংকের নাম</label>
+                            <input type="text" id="bankName" class="form-input" placeholder="যেমন: Dutch Bangla Bank">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">অ্যাকাউন্ট নাম</label>
+                            <input type="text" id="bankAccountName" class="form-input" placeholder="যেমন: মোহাম্মদ আহমেদ">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">অ্যাকাউন্ট নম্বর</label>
+                            <input type="text" id="bankAccountNumber" class="form-input" placeholder="যেমন: 1234567890123456">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">রাউটিং নম্বর (যদি থাকে)</label>
+                            <input type="text" id="routingNumber" class="form-input" placeholder="যেমন: 123456789">
+                        </div>
+                    </div>
+
+                    <!-- Mobile Account Details -->
+                    <div id="mobileDetails" class="account-details">
+                        <div class="form-group">
+                            <label class="form-label">মোবাইল ওয়ালেট</label>
+                            <select id="mobileWallet" class="form-select">
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="bkash">bKash</option>
+                                <option value="nagad">Nagad</option>
+                                <option value="rocket">Rocket</option>
+                                <option value="upay">Upay</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">মোবাইল নম্বর</label>
+                            <input type="tel" id="mobileNumber" class="form-input" placeholder="যেমন: 01712345678">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">অ্যাকাউন্ট টাইপ</label>
+                            <select id="mobileAccountType" class="form-select">
+                                <option value="personal">ব্যক্তিগত</option>
+                                <option value="agent">এজেন্ট</option>
+                                <option value="merchant">মার্চেন্ট</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Crypto Account Details -->
+                    <div id="cryptoDetails" class="account-details">
+                        <div class="form-group">
+                            <label class="form-label">ক্রিপ্টোকারেন্সি</label>
+                            <select id="cryptoType" class="form-select">
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="bitcoin">Bitcoin (BTC)</option>
+                                <option value="usdt_trc20">USDT (TRC-20)</option>
+                                <option value="usdt_erc20">USDT (ERC-20)</option>
+                                <option value="ethereum">Ethereum (ETH)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ওয়ালেট ঠিকানা</label>
+                            <input type="text" id="walletAddress" class="form-input" placeholder="যেমন: 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">নেটওয়ার্ক (যদি প্রযোজ্য)</label>
+                            <input type="text" id="network" class="form-input" placeholder="যেমন: TRC-20, ERC-20">
+                        </div>
+                    </div>
+
+                    <!-- Additional Notes -->
+                    <div class="form-group">
+                        <label class="form-label">অতিরিক্ত নোট (ঐচ্ছিক)</label>
+                        <textarea id="notes" class="form-textarea" placeholder="কোনো বিশেষ নির্দেশনা লিখুন..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                        উইথড্র রিকুয়েস্ট জমা দিন
+                    </button>
+                </form>
+
+                <div id="message"></div>
+            </div>
+
+            <!-- Withdrawal History -->
+            <div class="history-container">
+                <h3 class="history-title">📋 উইথড্র ইতিহাস</h3>
+                <div id="withdrawalHistory" class="loading">ইতিহাস লোড হচ্ছে...</div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="b-item" onclick="window.location.href='index.html'">
+            <div class="b-icon">🏠</div>
+            <div>হোম</div>
+        </div>
+        <div class="b-item" onclick="window.location.href='deposit.html'">
+            <div class="b-icon">💰</div>
+            <div>ডিপোজিট</div>
+        </div>
+        <div class="b-item" onclick="window.location.href='withdrawal.html'">
+            <div class="b-icon">💸</div>
+            <div>উইথড্র</div>
+        </div>
+        <div class="b-item" onclick="window.location.href='rewards.html'">
+            <div class="b-icon">🏆</div>
+            <div>পুরস্কার</div>
+        </div>
+        <div class="b-item" onclick="window.location.href='profile.html'">
+            <div class="b-icon">👤</div>
+            <div>অ্যাকাউন্ট</div>
+        </div>
+    </nav>
+
+    <script src="js/auth.js"></script>
+    <script>
+        class WithdrawalManager {
+            constructor() {
+                this.selectedMethod = null;
+                this.currentBalance = 0;
+                this.init();
+            }
+
+            init() {
+                // Check if user is logged in
+                if (!authManager.isLoggedIn()) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                this.loadBalance();
+                this.loadWithdrawalHistory();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Method selection
+                document.querySelectorAll('.method-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        this.selectMethod(card.dataset.method);
+                    });
+                });
+
+                // Form validation
+                const form = document.getElementById('withdrawalForm');
+                const amountInput = document.getElementById('withdrawAmount');
+                const submitBtn = document.getElementById('submitBtn');
+
+                amountInput.addEventListener('input', () => {
+                    this.validateForm();
+                });
+
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitWithdrawal();
+                });
+
+                // Real-time amount validation
+                amountInput.addEventListener('input', (e) => {
+                    const amount = parseFloat(e.target.value) || 0;
+                    this.updateAmountDisplay(amount);
+                });
+            }
+
+            selectMethod(method) {
+                // Remove previous selection
+                document.querySelectorAll('.method-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+
+                // Hide all details
+                document.querySelectorAll('.account-details').forEach(details => {
+                    details.classList.remove('show');
+                });
+
+                // Select new method
+                document.querySelector(`[data-method="${method}"]`).classList.add('selected');
+                document.getElementById(`${method}Details`).classList.add('show');
+
+                this.selectedMethod = method;
+                this.validateForm();
+            }
+
+            async loadBalance() {
+                try {
+                    const balance = await authManager.getBalance();
+                    this.currentBalance = balance || 0;
+                    
+                    document.getElementById('currentBalance').textContent = `${balance.toFixed(2)} ZST`;
+                    document.getElementById('maxAmount').textContent = balance.toFixed(2);
+                    document.getElementById('balanceBDT').textContent = (balance * 100).toFixed(2);
+                    document.getElementById('balanceUSD').textContent = (balance * 0.90).toFixed(2);
+                } catch (error) {
+                    console.error('Error loading balance:', error);
+                    this.showMessage('ব্যালেন্স লোড করতে সমস্যা হয়েছে', 'error');
+                }
+            }
+
+            async loadWithdrawalHistory() {
+                try {
+                    const response = await fetch('/api/withdrawal.php', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + authManager.getAuthToken()
+                        }
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        this.renderWithdrawalHistory(result.withdrawals);
+                    } else {
+                        document.getElementById('withdrawalHistory').innerHTML = '<div style="text-align: center; color: var(--muted);">ইতিহাস লোড করতে সমস্যা হয়েছে</div>';
+                    }
+                } catch (error) {
+                    console.error('Error loading withdrawal history:', error);
+                    document.getElementById('withdrawalHistory').innerHTML = '<div style="text-align: center; color: var(--muted);">ইতিহাস লোড করতে সমস্যা হয়েছে</div>';
+                }
+            }
+
+            renderWithdrawalHistory(withdrawals) {
+                const historyContainer = document.getElementById('withdrawalHistory');
+                
+                if (!withdrawals || withdrawals.length === 0) {
+                    historyContainer.innerHTML = '<div style="text-align: center; color: var(--muted);">কোনো উইথড্র ইতিহাস নেই</div>';
+                    return;
+                }
+
+                const historyHTML = withdrawals.map(withdrawal => `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div class="history-amount">${withdrawal.zst_amount} ZST</div>
+                            <div class="history-method">${this.getMethodName(withdrawal.method)} • ≈${withdrawal.bdt_amount} BDT</div>
+                            <div class="history-date">${new Date(withdrawal.created_at).toLocaleString('bn-BD')}</div>
+                            ${withdrawal.admin_notes ? `<div style="font-size: 0.8rem; color: var(--info); margin-top: 4px;">${withdrawal.admin_notes}</div>` : ''}
+                        </div>
+                        <div class="status-badge status-${withdrawal.status}">
+                            ${this.getStatusText(withdrawal.status)}
+                        </div>
+                    </div>
+                `).join('');
+
+                historyContainer.innerHTML = historyHTML;
+            }
+
+            getMethodName(method) {
+                const methodNames = {
+                    'bank': 'ব্যাংক ট্রান্সফার',
+                    'mobile': 'মোবাইল ওয়ালেট',
+                    'crypto': 'ক্রিপ্টোকারেন্সি'
+                };
+                return methodNames[method] || method;
+            }
+
+            getStatusText(status) {
+                const statusTexts = {
+                    'pending': 'পেন্ডিং',
+                    'approved': 'অনুমোদিত',
+                    'completed': 'সম্পূর্ণ',
+                    'rejected': 'বাতিল',
+                    'cancelled': 'বাতিলকৃত'
+                };
+                return statusTexts[status] || status;
+            }
+
+            updateAmountDisplay(amount) {
+                const bdtAmount = amount * 100;
+                const usdAmount = amount * 0.90;
+                
+                // Update conversion display if exists
+                const conversionDisplay = document.querySelector('.conversion-display');
+                if (conversionDisplay) {
+                    conversionDisplay.textContent = `≈ ${bdtAmount.toFixed(2)} BDT | $${usdAmount.toFixed(2)} USD`;
+                }
+            }
+
+            validateForm() {
+                const amount = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+                const submitBtn = document.getElementById('submitBtn');
+                
+                let isValid = true;
+                let errorMsg = '';
+
+                // Check amount
+                if (amount < 5) {
+                    isValid = false;
+                    errorMsg = 'ন্যূনতম উইথড্র পরিমাণ ৫ ZST';
+                } else if (amount > this.currentBalance) {
+                    isValid = false;
+                    errorMsg = 'অপর্যাপ্ত ব্যালেন্স';
+                }
+
+                // Check method selection
+                if (!this.selectedMethod) {
+                    isValid = false;
+                    errorMsg = 'উইথড্র পদ্ধতি নির্বাচন করুন';
+                }
+
+                // Check method-specific details
+                if (this.selectedMethod && isValid) {
+                    isValid = this.validateMethodDetails();
+                }
+
+                submitBtn.disabled = !isValid;
+                
+                if (errorMsg) {
+                    this.showMessage(errorMsg, 'error');
+                } else {
+                    this.clearMessage();
+                }
+            }
+
+            validateMethodDetails() {
+                switch (this.selectedMethod) {
+                    case 'bank':
+                        return document.getElementById('bankName').value.trim() &&
+                               document.getElementById('bankAccountName').value.trim() &&
+                               document.getElementById('bankAccountNumber').value.trim();
+                    
+                    case 'mobile':
+                        return document.getElementById('mobileWallet').value &&
+                               document.getElementById('mobileNumber').value.trim();
+                    
+                    case 'crypto':
+                        return document.getElementById('cryptoType').value &&
+                               document.getElementById('walletAddress').value.trim();
+                    
+                    default:
+                        return false;
+                }
+            }
+
+            async submitWithdrawal() {
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'জমা দিচ্ছি...';
+
+                try {
+                    const withdrawalData = this.collectFormData();
+                    
+                    const response = await fetch('/api/withdrawal.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + authManager.getAuthToken()
+                        },
+                        body: JSON.stringify(withdrawalData)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showMessage('উইথড্র রিকুয়েস্ট সফলভাবে জমা হয়েছে! অ্যাডমিন অনুমোদনের জন্য অপেক্ষা করুন।', 'success');
+                        this.resetForm();
+                        this.loadBalance();
+                        this.loadWithdrawalHistory();
+                    } else {
+                        this.showMessage(result.message || 'উইথড্র রিকুয়েস্ট জমা দিতে সমস্যা হয়েছে', 'error');
+                    }
+                } catch (error) {
+                    console.error('Withdrawal submission error:', error);
+                    this.showMessage('নেটওয়ার্ক সমস্যা হয়েছে', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'উইথড্র রিকুয়েস্ট জমা দিন';
+                }
+            }
+
+            collectFormData() {
+                const amount = parseFloat(document.getElementById('withdrawAmount').value);
+                const notes = document.getElementById('notes').value.trim();
+                
+                let accountDetails = {};
+
+                switch (this.selectedMethod) {
+                    case 'bank':
+                        accountDetails = {
+                            bank_name: document.getElementById('bankName').value.trim(),
+                            account_name: document.getElementById('bankAccountName').value.trim(),
+                            account_number: document.getElementById('bankAccountNumber').value.trim(),
+                            routing_number: document.getElementById('routingNumber').value.trim()
+                        };
+                        break;
+                    
+                    case 'mobile':
+                        accountDetails = {
+                            wallet: document.getElementById('mobileWallet').value,
+                            mobile_number: document.getElementById('mobileNumber').value.trim(),
+                            account_type: document.getElementById('mobileAccountType').value
+                        };
+                        break;
+                    
+                    case 'crypto':
+                        accountDetails = {
+                            crypto_type: document.getElementById('cryptoType').value,
+                            wallet_address: document.getElementById('walletAddress').value.trim(),
+                            network: document.getElementById('network').value.trim()
+                        };
+                        break;
+                }
+
+                return {
+                    method: this.selectedMethod,
+                    zst_amount: amount,
+                    account_details: accountDetails,
+                    notes: notes
+                };
+            }
+
+            resetForm() {
+                document.getElementById('withdrawalForm').reset();
+                document.querySelectorAll('.method-card').forEach(card => card.classList.remove('selected'));
+                document.querySelectorAll('.account-details').forEach(details => details.classList.remove('show'));
+                this.selectedMethod = null;
+                this.clearMessage();
+            }
+
+            showMessage(text, type) {
+                const messageEl = document.getElementById('message');
+                messageEl.textContent = text;
+                messageEl.className = `message ${type}`;
+                messageEl.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }
+
+            clearMessage() {
+                const messageEl = document.getElementById('message');
+                messageEl.style.display = 'none';
+            }
+        }
+
+        // Initialize withdrawal manager when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            new WithdrawalManager();
+        });
+    </script>
+</body>
+</html>
