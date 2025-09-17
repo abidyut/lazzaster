@@ -177,7 +177,7 @@ function handleSecureLogin($db, $data) {
         FROM admin_logs 
         WHERE action = 'failed_login' 
         AND ip_address = ? 
-        AND created_at > NOW() - INTERVAL '15 minutes'
+        AND created_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)
     ");
     $stmt->execute([$ipAddress]);
     $failedAttempts = $stmt->fetch(PDO::FETCH_ASSOC)['failed_attempts'];

@@ -74,7 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $db->prepare("
             INSERT INTO deposits (user_id, username, method, transaction_id, zst_amount, bdt_amount, usd_amount, status) 
             VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
-            RETURNING id
         ");
         $stmt->execute([
             $userId, 
@@ -86,8 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $usdAmount
         ]);
         
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $depositId = $result['id'];
+        $depositId = $db->lastInsertId();
         
         echo json_encode([
             'success' => true, 
